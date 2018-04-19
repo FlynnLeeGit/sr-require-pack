@@ -99,9 +99,6 @@ const htmlTask = (
                             bundle.write(rollupConfig.outputOptions)
                         )
                         .then(() => {
-                            node.attrs['src'] = requirejs
-                            delete node.attrs.amd
-
                             const filecontent = fse.readFileSync(file, {
                                 encoding: 'utf-8'
                             })
@@ -123,19 +120,28 @@ const htmlTask = (
                                         document.head.appendChild(s);
                                     };
                                 `
-                            if(node.attrs.amd){
-                                newContent+=`window.${node.attrs.amd} = function(){`
-                            }
                             newContent += filecontent
-                            if(node.attrs.amd){
-                                newContent+= '})'
-                            }
-                            node.attrs['data-main'] = getUrl({
+                            const mainUrl = getUrl({
                                 name: relativeEntry,
                                 hash,
                                 ext,
                                 type: 'js'
                             })
+                            if (node.attrs.amd === 'onload') {
+                                node.attrs = {}
+                                node.content = `
+                                    window.onload = function(){
+                                        var s = document.createElement('script');
+                                        s.src = '${requirejs}';
+                                        s.setAttribute('data-main','${mainUrl}');
+                                        document.head.appendChild(s);
+                                    };
+                                `
+                            } else {
+                                node.attrs['src'] = requirejs
+                                node.attrs['data-main'] = mainUrl
+                            }
+                            delete node.attrs.amd
                             return ensureOutputFile(file, newContent)
                         })
                         .catch(e => {

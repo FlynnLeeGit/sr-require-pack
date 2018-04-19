@@ -3,8 +3,8 @@ if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'production'
 }
 
-const requireBuild = require('../require-pack.build')
 const Path = require('path')
+const requireBuild = require(Path.resolve('./require-pack.build'))
 
 const DIST_DIR =
     Path.resolve(requireBuild.build.distDir) || Path.resolve('./dist')
