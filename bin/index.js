@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+const Path = require('path')
 const gulp = require('gulp')
 const browserSync = require('browser-sync').create()
 

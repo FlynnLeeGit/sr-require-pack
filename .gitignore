@@ -1,6 +1,9 @@
 node_modules
+test
+
+# test
 require-pack.build.js
 require-pack.web.js
-src
-dist
 .babelrc
+test-src
+test-dist
