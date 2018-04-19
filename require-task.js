@@ -103,8 +103,7 @@ const requireTask = (distnameTpl = TPL) => {
     })
 
     requireConfig = _.cloneDeep(conf)
-    delete requireConfig.paths_dev
-    delete requireConfig.paths_prod
+    delete requireConfig.production
     requireConfig.paths = jsPaths
 
     return Promise.all(tasks).then(() => {
