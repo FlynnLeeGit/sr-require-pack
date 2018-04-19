@@ -11,6 +11,7 @@
     "posthtml": "^0.11.3",
     "rollup-plugin-less": "^0.1.4",
     "rollup-plugin-uglify": "^3.0.0",
-    "rollup-plugin-vue": "^3.0.0"
+    "rollup-plugin-vue": "^3.0.0",
+    "vue-template-compiler": "^2.5.16"
   }
 }
