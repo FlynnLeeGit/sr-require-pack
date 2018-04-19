@@ -1,12 +1,15 @@
 {
-    "scripts": {
-        "init": "cd bin && cnpm i",
-        "dev": "NODE_ENV=development node bin/index.js",
-        "build": "node bin/index.js"
-    },
-    "dependencies": {
-        "fancybox": "^2.1.5",
-        "jquery": "^1.12.3",
-        "vue": "^2.5.16"
-    }
+  "scripts": {
+    "init": "cd bin && cnpm i",
+    "dev": "NODE_ENV=development node bin/index.js",
+    "build": "node bin/index.js"
+  },
+  "dependencies": {
+    "fancybox": "^2.1.5",
+    "jquery": "^1.12.3",
+    "vue": "^2.5.16"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.6.1"
+  }
 }

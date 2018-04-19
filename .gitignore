@@ -3,3 +3,4 @@ require-pack.build.js
 require-pack.web.js
 src
 dist
+.babelrc

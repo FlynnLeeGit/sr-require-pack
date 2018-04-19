@@ -7,6 +7,7 @@ const fse = require('fs-extra')
 const rollupLess = require('rollup-plugin-less')
 const rollupVue = require('rollup-plugin-vue')
 const rollupUglify = require('rollup-plugin-uglify')
+const rollupBabel = require('rollup-plugin-babel')
 
 const md5 = require('./utils/md5')
 const generateCssContent = require('./utils/generate-css-content')
@@ -55,12 +56,15 @@ const htmlTask = (
                 }),
                 rollupVue({
                     css: true
-                })
+                }),
+                rollupBabel(),
+                // rollupUglify()
             ]
         },
         outputOptions: {
             format: 'amd',
-            paths
+            paths,
+            sourceMap: true
         }
     }
 
