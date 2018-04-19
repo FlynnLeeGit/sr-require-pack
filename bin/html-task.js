@@ -74,6 +74,8 @@ const htmlTask = (
             const tasks = []
 
             tree.match({ tag: 'script' }, node => {
+                node.attrs = node.attrs || {}
+    
                 if ('amd' in node.attrs) {
                     const src = node.attrs.src
 

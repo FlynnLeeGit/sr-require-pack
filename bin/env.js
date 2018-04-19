@@ -4,6 +4,7 @@ if (!process.env.NODE_ENV) {
 }
 
 const Path = require('path')
+
 const requireBuild = require(Path.resolve('./require-pack.build'))
 
 const DIST_DIR =

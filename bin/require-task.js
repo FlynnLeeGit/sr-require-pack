@@ -38,7 +38,8 @@ const requireTask = (distnameTpl = TPL) => {
             return
         }
         if (!is.url(v)) {
-            const modulePath = require.resolve(v)
+            const absPath = Path.resolve(v)
+            const modulePath = require.resolve(absPath)
             const moduleDir = Path.dirname(modulePath)
             const moduleContent = fse.readFileSync(modulePath, {
                 encoding: 'utf-8'
@@ -91,12 +92,14 @@ const requireTask = (distnameTpl = TPL) => {
     })
     _.forEach(conf.shim, (obj, name) => {
         if (_.isArray(obj)) {
-            conf.shim[name] = obj.map(
+            const _deps = obj
+            conf.shim[name] = _deps.map(
                 dep => (dep in cssPaths ? cssPaths[dep] : dep)
             )
         }
         if (_.isPlainObject(obj)) {
-            obj.deps = obj.deps.map(
+            const _dep = obj.deps || []
+            obj.deps = _dep.map(
                 dep => (dep in cssPaths ? cssPaths[dep] : dep)
             )
         }

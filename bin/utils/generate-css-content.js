@@ -7,13 +7,15 @@ const md5 = require('./md5')
 const is = require('./is')
 const getUrl = require('./get-url')
 
-const CSS_REQUIRE_REG = /url\(['"]?([^'"]+)['"]?\)/g
+const CSS_REQUIRE_REG = /url\(['"]?([^'"\(\)]+)['"]?\)/g
 
 const generateCssContent = (cssText, baseDir) => {
     const tasks = []
     const newCssText = cssText.replace(CSS_REQUIRE_REG, (match, r) => {
+        r = r.trim()
         if (!is.url(r)) {
             const path = Path.join(baseDir, r)
+            // console.log(baseDir,'baseDIr','r--->',r,'path->',path)
             const content = fse.readFileSync(path)
             const hash = md5(content)
             const ext = Path.extname(path)
