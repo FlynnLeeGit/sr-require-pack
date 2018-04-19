@@ -13,7 +13,12 @@ const generateCssContent = (cssText, baseDir) => {
     const tasks = []
     const newCssText = cssText.replace(CSS_REQUIRE_REG, (match, r) => {
         r = r.trim()
+        // 只替换非url的路径
         if (!is.url(r)) {
+            // 不带入query参数值
+            if (r.indexOf('?') > -1) {
+                r = r.split('?')[0]
+            }
             const path = Path.join(baseDir, r)
             // console.log(baseDir,'baseDIr','r--->',r,'path->',path)
             const content = fse.readFileSync(path)

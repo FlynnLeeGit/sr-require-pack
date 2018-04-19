@@ -99,9 +99,7 @@ const requireTask = (distnameTpl = TPL) => {
         }
         if (_.isPlainObject(obj)) {
             const _dep = obj.deps || []
-            obj.deps = _dep.map(
-                dep => (dep in cssPaths ? cssPaths[dep] : dep)
-            )
+            obj.deps = _dep.map(dep => (dep in cssPaths ? cssPaths[dep] : dep))
         }
     })
 
@@ -110,11 +108,14 @@ const requireTask = (distnameTpl = TPL) => {
     requireConfig.paths = jsPaths
 
     return Promise.all(tasks).then(() => {
+        console.log(
+            `[require-pack] requireConfig bundled ${Date.now() - start}ms`
+        )
+
         return {
             requireConfig,
             jsPaths,
-            cssPaths,
-            buildTime: Date.now() - start
+            cssPaths
         }
     })
 }

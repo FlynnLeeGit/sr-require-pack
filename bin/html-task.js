@@ -16,7 +16,7 @@ const getDistname = require('./utils/get-distname')
 const getEntry = require('./utils/get-entry')
 const getUrl = require('./utils/get-url')
 
-const { SRC_DIR, requirejs } = require('./env')
+const { SRC_DIR, requirejs, browserSync } = require('./env')
 
 const CLEAN_CSS_OPTS = {
     format: 'keep-breaks'
@@ -57,7 +57,7 @@ const htmlTask = (
                 rollupVue({
                     css: true
                 }),
-                rollupBabel(),
+                rollupBabel()
                 // rollupUglify()
             ]
         },
@@ -75,7 +75,7 @@ const htmlTask = (
 
             tree.match({ tag: 'script' }, node => {
                 node.attrs = node.attrs || {}
-    
+
                 if ('amd' in node.attrs) {
                     const src = node.attrs.src
 
@@ -119,13 +119,15 @@ const htmlTask = (
                                 null,
                                 2
                             )});`
-                            newContent += `
-                                    if(process.env.NODE_ENV==='development'){
-                                        var s= document.createElement('script');
-                                        s.src = 'http://HOST:${3000}/browser-sync/browser-sync-client.js'.replace('HOST',location.hostname);
-                                        document.head.appendChild(s);
-                                    };
-                                `
+                            if (!browserSync.proxy) {
+                                newContent += `
+                                if(process.env.NODE_ENV==='development'){
+                                    var s= document.createElement('script');
+                                    s.src = 'http://HOST:${3000}/browser-sync/browser-sync-client.js'.replace('HOST',location.hostname);
+                                    document.head.appendChild(s);
+                                };
+                            `
+                            }
                             newContent += filecontent
                             const mainUrl = getUrl({
                                 name: relativeEntry,
@@ -161,47 +163,48 @@ const htmlTask = (
             Promise.all(tasks).then(() => {
                 // 有css样式
                 if (extractCss) {
-                    tree.match({ tag: 'head' }, node => {
-                        node.content.push({
-                            tag: 'link',
-                            attrs: {
-                                rel: 'stylesheet',
-                                href: getUrl(extractCss)
-                            }
-                        })
-                        return node
+                    tree.unshift({
+                        tag: 'link',
+                        attrs: {
+                            rel: 'stylesheet',
+                            href: getUrl(extractCss)
+                        }
                     })
                 }
                 cb(null, tree)
             })
         }
     }
-    return (
-        posthtml()
-            .use(
-                myPlugin({
-                    rootDir: Path.dirname(srcFile)
-                })
+    const start = Date.now()
+    return posthtml()
+        .use(
+            myPlugin({
+                rootDir: Path.dirname(srcFile)
+            })
+        )
+        .process(fse.readFileSync(srcFile, { encoding: 'utf-8' }))
+        .then(ret => {
+            const entry = getEntry(srcFile, SRC_DIR)
+            return fse.outputFile(
+                getDistname({
+                    name: entry,
+                    tpl: '[name].html',
+                    type: 'html'
+                }),
+                ret.html
             )
-            .process(fse.readFileSync(srcFile, { encoding: 'utf-8' }))
-            .then(ret => {
-                const entry = getEntry(srcFile, SRC_DIR)
-                return fse.outputFile(
-                    getDistname({
-                        name: entry,
-                        tpl: '[name].html',
-                        type: 'html'
-                    }),
-                    ret.html
-                )
-            })
-            // .then(()=>{
-
-            // })
-            .catch(e => {
-                console.error(e)
-            })
-    )
+        })
+        .then(() => {
+            console.log(
+                `[require-pack] ${getEntry(
+                    srcFile,
+                    SRC_DIR
+                )} bundled ${Date.now() - start}ms`
+            )
+        })
+        .catch(e => {
+            console.error(e)
+        })
 }
 
 module.exports = htmlTask
