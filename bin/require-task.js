@@ -8,18 +8,14 @@ const generateCssContent = require('./utils/generate-css-content')
 const getDistname = require('./utils/get-distname')
 const getUrl = require('./utils/get-url')
 
-const { TPL, isDev, isProd, require_web } = require('./env')
+const { TPL, isDev, isProd, webConfig } = require('./env')
 const is = require('./utils/is')
 
 const requireTask = (distnameTpl = TPL) => {
-    let requireConfig = {}
     let start = Date.now()
-    delete require.cache[require_web]
-    const _conf = require(require_web)
+    const conf = webConfig()
     const jsPaths = {}
     const cssPaths = {}
-
-    const conf = _.merge(_conf, isProd ? _conf.production || {} : {})
 
     const alias = conf.paths
     const tasks = []
@@ -109,7 +105,6 @@ const requireTask = (distnameTpl = TPL) => {
     })
 
     requireConfig = _.cloneDeep(conf)
-    delete requireConfig.production
     requireConfig.paths = jsPaths
 
     return Promise.all(tasks).then(() => {

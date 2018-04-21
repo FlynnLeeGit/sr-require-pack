@@ -16,7 +16,7 @@ const getDistname = require('./utils/get-distname')
 const getEntry = require('./utils/get-entry')
 const getUrl = require('./utils/get-url')
 
-const { SRC_DIR, requirejs, isDev } = require('./env')
+const { SRC_DIR, isDev, requirejs } = require('./env')
 
 const CLEAN_CSS_OPTS = {
     format: 'keep-breaks'
@@ -76,7 +76,7 @@ const htmlTask = (
             tree.match({ tag: 'script' }, node => {
                 node.attrs = node.attrs || {}
 
-                if ('amd' in node.attrs) {
+                if ('require-pack' in node.attrs) {
                     const src = node.attrs.src
 
                     const input = Path.join(rootDir, src)
@@ -111,9 +111,6 @@ const htmlTask = (
                             let newContent = `
                                     window.process = window.process || {};
                                     window.process.env = window.process.env || {};
-                                    window.process.env.EXTERNALS = ${JSON.stringify(
-                                        external
-                                    )}
                                     window.process.env.REQUIRE_CONFIG = ${JSON.stringify(
                                         requireConfig,
                                         null,
@@ -141,7 +138,8 @@ const htmlTask = (
                                 ext,
                                 type: 'js'
                             })
-                            if (node.attrs.amd === 'onload') {
+                            // when the require-pack should load
+                            if (node.attrs['require-pack'] === 'onload') {
                                 node.attrs = {}
                                 node.content = `
                                     window.onload = function(){
@@ -155,7 +153,7 @@ const htmlTask = (
                                 node.attrs['src'] = requirejs
                                 node.attrs['data-main'] = mainUrl
                             }
-                            delete node.attrs.amd
+                            delete node.attrs['require-pack']
                             return ensureOutputFile(file, newContent)
                         })
                         .catch(e => {

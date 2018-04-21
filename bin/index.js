@@ -22,7 +22,7 @@ const execReqireTask = () => {
 }
 
 const execHtmlTasks = () => {
-    const htmls = glob.sync(env.htmls)
+    const htmls = glob.sync(env.html)
     const htmlTasks = htmls.map(srcFile =>
         htmlTask(srcFile, {
             external: Object.keys(jsPaths).concat(Object.keys(cssPaths)),
@@ -41,7 +41,7 @@ const execWholeTask = () => {
 
 if (env.isDev) {
     const liveServer = livereload.createServer({
-        delay: 200,
+        delay: 100,
         port: 35729
     })
     liveServer.watch(env.DIST_DIR)
@@ -49,7 +49,8 @@ if (env.isDev) {
     watch([`${env.SRC_DIR}/**/*.*`], function(event) {
         execHtmlTasks()
     })
-    watch([env.require_web], function(e) {
+    console.log(env.requireWebConfigPath)
+    watch([env.requireWebConfigPath], function(e) {
         execWholeTask()
     })
 }

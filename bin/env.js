@@ -1,3 +1,4 @@
+const _ = require('lodash')
 // 默认为生产环境
 if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'production'
@@ -5,29 +6,65 @@ if (!process.env.NODE_ENV) {
 
 const Path = require('path')
 
-const requireBuild = require(Path.resolve('./require-pack.build'))
+let userBuildConfig = {}
+try {
+    userBuildConfig = require(Path.resolve('./require-pack.build'))
+} catch (e) {
+    console.log('can not find require-pack.build.js use default buildConfig')
+}
 
-const DIST_DIR =
-    Path.resolve(requireBuild.build.distDir) || Path.resolve('./dist')
+const defaultBuildConfig = {
+    srcDir: './src',
+    distDir: './dist',
+    html: './src/**/*.html',
+    publicUrl: '/',
+    requirejs: 'https://cdn.bootcss.com/require.js/2.3.5/require.min.js'
+}
 
-const bsOptions = requireBuild.browserSync || {}
-bsOptions.files = [Path.resolve(DIST_DIR, '**/*.*')]
+const buildConfig = _.merge(defaultBuildConfig, userBuildConfig)
 
-module.exports = {
-    SRC_DIR: Path.resolve(requireBuild.build.srcDir) || Path.resolve('./src'),
-    DIST_DIR: DIST_DIR,
-    PUBLIC: requireBuild.build.publicUrl || '/',
+const requireWebConfigPath = require.resolve(Path.resolve('./require-pack.web'))
 
-    STATIC_JS: 'js',
-    STATIC_CSS: 'css',
-    STATIC_RES: 'res',
-    STATIC_VIEW: 'view',
+const finalConfig = {
+    SRC_DIR: Path.resolve(buildConfig.srcDir),
+    DIST_DIR: Path.resolve(buildConfig.distDir),
+    PUBLIC: buildConfig.publicUrl,
+
+    STATIC_JS: 'static/js',
+    STATIC_CSS: 'static/css',
+    STATIC_RES: 'static/res',
+    STATIC_VIEW: '',
 
     TPL: '[name][ext]?[hash:8]',
     isProd: process.env.NODE_ENV === 'production',
     isDev: process.env.NODE_ENV === 'development',
-    requirejs: requireBuild.requirejs,
-    browserSync: bsOptions,
-    htmls: Path.resolve(requireBuild.build.htmls),
-    require_web: Path.resolve('./require-pack.web.js')
+    requirejs: buildConfig.requirejs,
+    html: _.isArray(buildConfig.html)
+        ? buildConfig.html.map(h => Path.resolve(h))
+        : Path.resolve(buildConfig.html),
+    requireWebConfigPath,
+    webConfig() {
+        let userWebConfig = {}
+        delete require.cache[requireWebConfigPath]
+        userWebConfig = require(requireWebConfigPath)
+
+        const defaultWebConfig = {
+            paths: {},
+            shim: {},
+            map: {
+                '*': {
+                    css: 'https://cdn.bootcss.com/require-css/0.1.10/css.min.js'
+                }
+            },
+            production: {}
+        }
+        let webConfig = _.merge(defaultWebConfig, userWebConfig)
+        if (this.isProd) {
+            webConfig = _.merge(webConfig, webConfig.production)
+        }
+        delete webConfig.production
+        return webConfig
+    }
 }
+
+module.exports = finalConfig

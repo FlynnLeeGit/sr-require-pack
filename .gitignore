@@ -1,9 +1,2 @@
 node_modules
 test
-
-# test
-require-pack.build.js
-require-pack.web.js
-.babelrc
-test-src
-test-dist
