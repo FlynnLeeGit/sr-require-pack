@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 const Path = require('path')
 const gulp = require('gulp')
-const browserSync = require('browser-sync').create()
 const _ = require('lodash')
 
+const livereload = require('livereload')
 const watch = require('gulp-watch')
 const glob = require('glob')
 const env = require('./env')
@@ -40,18 +40,11 @@ const execWholeTask = () => {
 }
 
 if (env.isDev) {
-    const bsOpts = _.merge(
-        {
-            ui: {
-                port: 3000
-            },
-            open: false,
-            files: env.browserSync.files,
-            reloadDebounce: 150
-        },
-        env.browserSync
-    )
-    browserSync.init(bsOpts)
+    const liveServer = livereload.createServer({
+        delay: 200,
+        port: 35729
+    })
+    liveServer.watch(env.DIST_DIR)
     execWholeTask()
     watch([`${env.SRC_DIR}/**/*.*`], function(event) {
         execHtmlTasks()

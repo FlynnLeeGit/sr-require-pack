@@ -16,7 +16,7 @@ const getDistname = require('./utils/get-distname')
 const getEntry = require('./utils/get-entry')
 const getUrl = require('./utils/get-url')
 
-const { SRC_DIR, requirejs, browserSync } = require('./env')
+const { SRC_DIR, requirejs, isDev } = require('./env')
 
 const CLEAN_CSS_OPTS = {
     format: 'keep-breaks'
@@ -111,23 +111,29 @@ const htmlTask = (
                             let newContent = `
                                     window.process = window.process || {};
                                     window.process.env = window.process.env || {};
+                                    window.process.env.EXTERNALS = ${JSON.stringify(
+                                        external
+                                    )}
+                                    window.process.env.REQUIRE_CONFIG = ${JSON.stringify(
+                                        requireConfig,
+                                        null,
+                                        2
+                                    )};
                                     window.process.env.NODE_ENV = '${
                                         process.env.NODE_ENV
                                     }';`
-                            newContent += `require.config(${JSON.stringify(
-                                requireConfig,
-                                null,
-                                2
-                            )});`
-                            if (!browserSync.proxy) {
-                                newContent += `
+
+                            newContent += `require.config(process.env.REQUIRE_CONFIG);`
+                            newContent += `
                                 if(process.env.NODE_ENV==='development'){
                                     var s= document.createElement('script');
-                                    s.src = 'http://HOST:${3000}/browser-sync/browser-sync-client.js'.replace('HOST',location.hostname);
+                                    s.src = '//localhost:35729/livereload.js';
                                     document.head.appendChild(s);
+                                    s.onload = function(){
+                                        console.log('[development mode] livereload is running...')
+                                    };
                                 };
                             `
-                            }
                             newContent += filecontent
                             const mainUrl = getUrl({
                                 name: relativeEntry,

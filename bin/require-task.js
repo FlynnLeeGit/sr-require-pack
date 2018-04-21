@@ -38,8 +38,13 @@ const requireTask = (distnameTpl = TPL) => {
             return
         }
         if (!is.url(v)) {
-            const absPath = Path.resolve(v)
-            const modulePath = require.resolve(absPath)
+            let modulePath
+            if (v[0] === '.') {
+                // 非node_modules 模块
+                modulePath = require.resolve(Path.resolve(v))
+            } else {
+                modulePath = require.resolve(v)
+            }
             const moduleDir = Path.dirname(modulePath)
             const moduleContent = fse.readFileSync(modulePath, {
                 encoding: 'utf-8'
