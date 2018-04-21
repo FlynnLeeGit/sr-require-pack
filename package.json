@@ -18,7 +18,9 @@
     "posthtml": "^0.11.3",
     "rollup": "^0.58.1",
     "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-less": "^0.1.4",
+    "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-uglify": "^3.0.0",
     "rollup-plugin-vue": "^3.0.0",
     "vue-template-compiler": "^2.5.16"

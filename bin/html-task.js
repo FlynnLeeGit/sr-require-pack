@@ -57,7 +57,9 @@ const htmlTask = (
                 rollupVue({
                     css: true
                 }),
-                rollupBabel()
+                rollupBabel({
+                    exclude: 'node_modules/**'
+                })
                 // rollupUglify()
             ]
         },

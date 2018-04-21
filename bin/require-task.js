@@ -39,7 +39,12 @@ const requireTask = (distnameTpl = TPL) => {
                 // 非node_modules 模块
                 modulePath = require.resolve(Path.resolve(v))
             } else {
-                modulePath = require.resolve(v)
+                const findModulePaths = [Path.resolve('node_modules')].concat(
+                    module.paths
+                )
+                modulePath = require.resolve(v, {
+                    paths: findModulePaths
+                })
             }
             const moduleDir = Path.dirname(modulePath)
             const moduleContent = fse.readFileSync(modulePath, {

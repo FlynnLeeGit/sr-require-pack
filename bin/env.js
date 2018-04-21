@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const fse = require('fs-extra')
 // 默认为生产环境
 if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'production'
@@ -7,10 +8,9 @@ if (!process.env.NODE_ENV) {
 const Path = require('path')
 
 let userBuildConfig = {}
-try {
-    userBuildConfig = require(Path.resolve('./require-pack.build'))
-} catch (e) {
-    console.log('can not find require-pack.build.js use default buildConfig')
+const userBuildConifgPath = Path.resolve('./require-pack.build')
+if (fse.existsSync(Path.resolve('./require-pack.build'))) {
+    userBuildConfig = require(userBuildConifgPath)
 }
 
 const defaultBuildConfig = {
@@ -35,7 +35,7 @@ const finalConfig = {
     STATIC_RES: 'static/res',
     STATIC_VIEW: '',
 
-    TPL: '[name][ext]?[hash:8]',
+    TPL: '[name].[ext]?[hash:8]',
     isProd: process.env.NODE_ENV === 'production',
     isDev: process.env.NODE_ENV === 'development',
     requirejs: buildConfig.requirejs,
@@ -59,7 +59,7 @@ const finalConfig = {
             production: {}
         }
         let webConfig = _.merge(defaultWebConfig, userWebConfig)
-        if (this.isProd) {
+        if (process.env.NODE_ENV === 'production') {
             webConfig = _.merge(webConfig, webConfig.production)
         }
         delete webConfig.production
