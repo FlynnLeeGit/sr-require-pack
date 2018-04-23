@@ -16,6 +16,8 @@ const requireTask = (distnameTpl = TPL) => {
     const conf = webConfig()
     const jsPaths = {}
     const cssPaths = {}
+    // 外部已经引入的模块
+    const externalPaths = {}
 
     const alias = conf.paths
     const tasks = []
@@ -107,6 +109,10 @@ const requireTask = (distnameTpl = TPL) => {
             const _dep = obj.deps || []
             obj.deps = _dep.map(dep => (dep in cssPaths ? cssPaths[dep] : dep))
         }
+        // 在shim中配置但不存在于jsPaths路径中,相当于是预设的全局变量
+        if (!(name in jsPaths)) {
+            externalPaths[name] = conf.shim[name].exports
+        }
     })
 
     requireConfig = _.cloneDeep(conf)
@@ -120,7 +126,8 @@ const requireTask = (distnameTpl = TPL) => {
         return {
             requireConfig,
             jsPaths,
-            cssPaths
+            cssPaths,
+            externalPaths
         }
     })
 }

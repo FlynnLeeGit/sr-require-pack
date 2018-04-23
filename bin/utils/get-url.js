@@ -1,4 +1,10 @@
-const { PUBLIC, STATIC_JS, STATIC_CSS, STATIC_RES } = require('../env')
+const {
+    PUBLIC,
+    STATIC_JS,
+    STATIC_CSS,
+    STATIC_RES,
+    STATIC_CHUNK
+} = require('../env')
 
 const getFilename = require('./get-filename')
 
@@ -10,7 +16,8 @@ const getUrl = ({ name, hash, ext, tpl, type } = {}) => {
     const publics = {
         js: PUBLIC + STATIC_JS,
         css: PUBLIC + STATIC_CSS,
-        res: PUBLIC + STATIC_RES
+        res: PUBLIC + STATIC_RES,
+        chunk: PUBLIC + STATIC_CHUNK
     }
     const filename = getFilename({
         name,

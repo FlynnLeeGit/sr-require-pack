@@ -14,6 +14,7 @@
     "fs-extra": "^5.0.0",
     "gulp": "^3.9.1",
     "gulp-watch": "^5.0.0",
+    "less": "^3.0.2",
     "livereload": "^0.7.0",
     "posthtml": "^0.11.3",
     "rollup": "^0.58.1",

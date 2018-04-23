@@ -4,7 +4,8 @@ const {
     STATIC_JS,
     STATIC_CSS,
     STATIC_RES,
-    STATIC_VIEW
+    STATIC_VIEW,
+    STATIC_CHUNK
 } = require('../env')
 
 const getFilename = require('./get-filename')
@@ -18,7 +19,6 @@ const getDistname = ({ name, hash, ext, tpl, type } = {}) => {
         js: Path.join(DIST_DIR, STATIC_JS),
         css: Path.join(DIST_DIR, STATIC_CSS),
         res: Path.join(DIST_DIR, STATIC_RES),
-        // chunk: Path.join(DIST_DIR, STAIC_CHUNK),
         html: Path.join(DIST_DIR, STATIC_VIEW)
     }
     return Path.join(

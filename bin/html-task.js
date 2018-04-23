@@ -8,6 +8,8 @@ const rollupLess = require('rollup-plugin-less')
 const rollupVue = require('rollup-plugin-vue')
 const rollupUglify = require('rollup-plugin-uglify')
 const rollupBabel = require('rollup-plugin-babel')
+const rollupResolve = require('rollup-plugin-node-resolve')
+const rollupCjs = require('rollup-plugin-commonjs')
 
 const md5 = require('./utils/md5')
 const generateCssContent = require('./utils/generate-css-content')
@@ -16,7 +18,7 @@ const getDistname = require('./utils/get-distname')
 const getEntry = require('./utils/get-entry')
 const getUrl = require('./utils/get-url')
 
-const { SRC_DIR, isDev, requirejs } = require('./env')
+const { SRC_DIR, isDev, isProd, requirejs } = require('./env')
 
 const CLEAN_CSS_OPTS = {
     format: 'keep-breaks'
@@ -26,33 +28,22 @@ const requireWrapper = content => {}
 
 const htmlTask = (
     srcFile,
-    { external = [], paths = {}, requireConfig = {} } = {}
+    {
+        rollupExternal = [],
+        rollupPaths = {},
+        requireConfig = {},
+        requireExternal = {}
+    } = {}
 ) => {
-    let extractCss = null
-
-    // output less file from js
-    const lessOut = (css, file) => {
-        const baseDir = Path.dirname(file)
-        const hash = md5(css)
-        const name = getEntry(srcFile, SRC_DIR)
-        extractCss = {
-            name,
-            hash,
-            ext: '.css',
-            type: 'css'
-        }
-        generateCssContent(css, baseDir)
-            .then(cssContent => new CleanCss(CLEAN_CSS_OPTS).minify(cssContent))
-            .then(ret => ensureOutputFile(getDistname(extractCss), ret.styles))
-        return css
-    }
-
     let rollupConfig = {
         inputOptions: {
-            external,
+            external: rollupExternal,
             plugins: [
                 rollupLess({
-                    output: lessOut
+                    insert: true,
+                    output(css, file) {
+                        return generateCssContent(css, Path.dirname(file))
+                    }
                 }),
                 rollupVue({
                     css: true
@@ -60,14 +51,16 @@ const htmlTask = (
                 rollupBabel({
                     exclude: 'node_modules/**'
                 })
-                // rollupUglify()
             ]
         },
         outputOptions: {
             format: 'amd',
-            paths,
+            paths: rollupPaths,
             sourceMap: true
         }
+    }
+    if (isProd) {
+        rollupConfig.inputOptions.plugins.push(rollupUglify())
     }
 
     const myPlugin = options => {
@@ -113,16 +106,20 @@ const htmlTask = (
                             let newContent = `
                                     window.process = window.process || {};
                                     window.process.env = window.process.env || {};
-                                    window.process.env.REQUIRE_CONFIG = ${JSON.stringify(
-                                        requireConfig,
-                                        null,
-                                        2
-                                    )};
                                     window.process.env.NODE_ENV = '${
                                         process.env.NODE_ENV
-                                    }';`
+                                    }';
+                                    window.REQUIRE_CONFIG = ${JSON.stringify(
+                                        requireConfig
+                                    )};
+                                    `
 
-                            newContent += `require.config(process.env.REQUIRE_CONFIG);`
+                            for (let externalName in requireExternal) {
+                                newContent += `define('${externalName}',function(){
+                                    return ${requireExternal[externalName]};
+                                });`
+                            }
+                            newContent += `require.config(REQUIRE_CONFIG);`
                             newContent += `
                                 if(process.env.NODE_ENV==='development'){
                                     var s= document.createElement('script');
@@ -167,16 +164,6 @@ const htmlTask = (
                 return node
             })
             Promise.all(tasks).then(() => {
-                // 有css样式
-                if (extractCss) {
-                    tree.unshift({
-                        tag: 'link',
-                        attrs: {
-                            rel: 'stylesheet',
-                            href: getUrl(extractCss)
-                        }
-                    })
-                }
                 cb(null, tree)
             })
         }

@@ -30,12 +30,12 @@ const finalConfig = {
     DIST_DIR: Path.resolve(buildConfig.distDir),
     PUBLIC: buildConfig.publicUrl,
 
-    STATIC_JS: 'static/js',
-    STATIC_CSS: 'static/css',
-    STATIC_RES: 'static/res',
+    STATIC_JS: '_static/js',
+    STATIC_CSS: '_static/css',
+    STATIC_RES: '_static/res',
     STATIC_VIEW: '',
 
-    TPL: '[name].[ext]?[hash:8]',
+    TPL: '[name][ext]?[hash:8]',
     isProd: process.env.NODE_ENV === 'production',
     isDev: process.env.NODE_ENV === 'development',
     requirejs: buildConfig.requirejs,
