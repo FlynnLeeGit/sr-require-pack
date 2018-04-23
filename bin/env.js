@@ -8,10 +8,9 @@ if (!process.env.NODE_ENV) {
 const Path = require('path')
 
 let userBuildConfig = {}
-const userBuildConifgPath = Path.resolve('./require-pack.build')
 
 try {
-    userBuildConfig = require.resolve(userBuildConifgPath)
+    userBuildConfig = require(Path.resolve('./require-pack.build'))
 } catch (e) {
     console.log('use default require-pack.build config')
 }

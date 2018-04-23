@@ -30,7 +30,8 @@ const generateCssContent = (cssText, baseDir) => {
                     name,
                     hash,
                     ext,
-                    type: 'res'
+                    type: 'res',
+                    tpl: '[name].[hash:8][ext]'
                 }),
                 content
             )
@@ -41,6 +42,7 @@ const generateCssContent = (cssText, baseDir) => {
                     name,
                     hash,
                     ext,
+                    tpl: '[name].[hash:8][ext]',
                     type: 'res'
                 })
             )
