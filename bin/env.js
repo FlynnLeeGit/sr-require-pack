@@ -9,8 +9,11 @@ const Path = require('path')
 
 let userBuildConfig = {}
 const userBuildConifgPath = Path.resolve('./require-pack.build')
-if (fse.existsSync(Path.resolve('./require-pack.build'))) {
-    userBuildConfig = require(userBuildConifgPath)
+
+try {
+    userBuildConfig = require.resolve(userBuildConifgPath)
+} catch (e) {
+    console.log('use default require-pack.build config')
 }
 
 const defaultBuildConfig = {
