@@ -1,6 +1,6 @@
 {
     "name": "require-pack",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "scripts": {
         "link": "node link.js",
         "pub": "npm version patch && npm publish && git push"
