@@ -1,5 +1,5 @@
 {
-    "name": "require-pack",
+    "name": "sr-require-pack",
     "version": "0.1.4",
     "scripts": {
         "link": "node link.js",
