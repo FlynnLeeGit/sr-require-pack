@@ -1,29 +1,30 @@
 {
-  "name": "require-pack",
-  "version": "0.1.3",
-  "scripts": {
-    "link": "node link.js"
-  },
-  "bin": {
-    "rpack": "./bin/index.js"
-  },
-  "dependencies": {
-    "babel": "^6.23.0",
-    "babel-core": "^6.26.0",
-    "clean-css": "^4.1.11",
-    "fs-extra": "^5.0.0",
-    "gulp": "^3.9.1",
-    "gulp-watch": "^5.0.0",
-    "less": "^3.0.2",
-    "livereload": "^0.7.0",
-    "posthtml": "^0.11.3",
-    "rollup": "^0.58.1",
-    "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-commonjs": "^9.1.0",
-    "rollup-plugin-less": "^0.1.4",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-uglify": "^3.0.0",
-    "rollup-plugin-vue": "^3.0.0",
-    "vue-template-compiler": "^2.5.16"
-  }
+    "name": "require-pack",
+    "version": "0.1.3",
+    "scripts": {
+        "link": "node link.js",
+        "pub": "npm version patch && npm publish && git push"
+    },
+    "bin": {
+        "rpack": "./bin/index.js"
+    },
+    "dependencies": {
+        "babel": "^6.23.0",
+        "babel-core": "^6.26.0",
+        "clean-css": "^4.1.11",
+        "fs-extra": "^5.0.0",
+        "gulp": "^3.9.1",
+        "gulp-watch": "^5.0.0",
+        "less": "^3.0.2",
+        "livereload": "^0.7.0",
+        "posthtml": "^0.11.3",
+        "rollup": "^0.58.1",
+        "rollup-plugin-babel": "^3.0.3",
+        "rollup-plugin-commonjs": "^9.1.0",
+        "rollup-plugin-less": "^0.1.4",
+        "rollup-plugin-node-resolve": "^3.3.0",
+        "rollup-plugin-uglify": "^3.0.0",
+        "rollup-plugin-vue": "^3.0.0",
+        "vue-template-compiler": "^2.5.16"
+    }
 }

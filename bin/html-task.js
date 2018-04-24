@@ -1,6 +1,6 @@
 const rollup = require('rollup')
 const posthtml = require('posthtml')
-const CleanCss = require('clean-css')
+// const CleanCss = require('clean-css')
 const Path = require('path')
 const fse = require('fs-extra')
 
@@ -20,9 +20,6 @@ const getUrl = require('./utils/get-url')
 
 const { SRC_DIR, isDev, isProd, requirejs } = require('./env')
 
-const CLEAN_CSS_OPTS = {
-    format: 'keep-breaks'
-}
 
 const requireWrapper = content => {}
 
