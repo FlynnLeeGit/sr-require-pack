@@ -44,7 +44,6 @@ const requireTask = (distnameTpl = TPL) => {
                 const findModulePaths = [Path.resolve('node_modules')].concat(
                     module.paths
                 )
-                console.log(findModulePaths)
                 modulePath = require.resolve(v, {
                     paths: findModulePaths
                 })
