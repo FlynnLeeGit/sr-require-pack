@@ -20,6 +20,13 @@ const getEntry = require('./utils/get-entry')
 const getUrl = require('./utils/get-url')
 const { getBranch, getCommit } = require('./utils/git')
 
+const definedRequireCss = fse.readFileSync(
+    __dirname + '/utils/require-css.js',
+    {
+        encoding: 'utf-8'
+    }
+)
+
 const { SRC_DIR, isDev, isProd, requirejs } = require('./env')
 
 const requireWrapper = content => {}
@@ -30,7 +37,8 @@ const htmlTask = (
         rollupExternal = [],
         rollupPaths = {},
         requireConfig = {},
-        requireExternal = {}
+        requireExternal = {},
+        livePort
     } = {}
 ) => {
     let rollupConfig = {
@@ -67,7 +75,6 @@ const htmlTask = (
             const tasks = []
             tree.walk(node => {
                 node.attrs = node.attrs || {}
-               
 
                 // js compile
                 if (node.tag === 'script' && 'require-pack' in node.attrs) {
@@ -124,7 +131,7 @@ const htmlTask = (
                                 prependScriptContent += `window.GIT = {branch:"${gitBranch}",commit:"${gitCommit}"};`
                             }
 
-                            prependScriptContent+=`
+                            prependScriptContent += `
                                 function $injectScript(src,attrs,cb){
                                     var s = document.createElement('script');
                                     s.src = src;
@@ -140,8 +147,8 @@ const htmlTask = (
 
                             prependScriptContent += `
                                 if(process.env.NODE_ENV==='development'){
-                                    $injectScript('//localhost:35729/livereload.js',{},function(){
-                                        console.log('[development mode] livereload is running...');
+                                    $injectScript('//localhost:${livePort}/livereload.js',{},function(){
+                                        console.log('[development mode] livereload is running on port ${livePort}...');
                                     });
                                 };
                             `
@@ -170,6 +177,8 @@ const htmlTask = (
                                     requireExternal[externalName]
                                 };});`
                             }
+                            prependDistContent += definedRequireCss + '\n'
+
                             prependDistContent += `require.config(REQUIRE_CONFIG);\n`
                             return fse.outputFile(
                                 file,

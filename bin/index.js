@@ -7,6 +7,7 @@ const livereload = require('livereload')
 const watch = require('gulp-watch')
 const glob = require('glob')
 const env = require('./env')
+const radomPort = require('./utils/radom-port')
 
 const requireTask = require('./require-task')
 const htmlTask = require('./html-task')
@@ -22,7 +23,7 @@ const execReqireTask = () => {
     })
 }
 
-const execHtmlTasks = () => {
+const execHtmlTasks = livePort => {
     const htmls = glob.sync(env.html)
     const htmlTasks = htmls.map(srcFile =>
         htmlTask(srcFile, {
@@ -33,32 +34,43 @@ const execHtmlTasks = () => {
             ],
             rollupPaths: cssPaths,
             requireConfig: requireConfig,
-            requireExternal: externalPaths
+            requireExternal: externalPaths,
+            livePort
         })
     )
     return Promise.all(htmlTasks)
 }
 
-const execWholeTask = () => {
+const execWholeTask = livePort => {
     return execReqireTask().then(() => {
-        return execHtmlTasks()
+        return execHtmlTasks(livePort)
+    })
+}
+
+const runDev = port => {
+    const liveServer = livereload.createServer({
+        delay: 200,
+        port
+    })
+    console.log('liveReload on ', port)
+    liveServer.watch(env.DIST_DIR)
+    execWholeTask(port)
+    watch([`${env.SRC_DIR}/**/*.*`], function(event) {
+        execHtmlTasks(port)
+    })
+    watch([env.requireWebConfigPath], function(e) {
+        execWholeTask(port)
     })
 }
 
 if (env.isDev) {
-    const liveServer = livereload.createServer({
-        delay: 200,
-        port: 35729
-    })
-    liveServer.watch(env.DIST_DIR)
-    execWholeTask()
-    watch([`${env.SRC_DIR}/**/*.*`], function(event) {
-        execHtmlTasks()
-    })
-    console.log(env.requireWebConfigPath)
-    watch([env.requireWebConfigPath], function(e) {
-        execWholeTask()
-    })
+    if (env.livePort) {
+        runDev(env.livePort)
+    } else {
+        radomPort().then(port => {
+            runDev(port)
+        })
+    }
 }
 
 if (env.isProd) {

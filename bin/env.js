@@ -20,6 +20,8 @@ const defaultBuildConfig = {
     distDir: './dist',
     html: './src/**/*.html',
     publicUrl: '/',
+    // 默认是随机端口
+    livePort: 0,
     requirejs: 'https://cdn.bootcss.com/require.js/2.3.5/require.min.js'
 }
 
@@ -45,6 +47,7 @@ const finalConfig = {
         ? buildConfig.html.map(h => Path.resolve(h))
         : Path.resolve(buildConfig.html),
     requireWebConfigPath,
+    livePort: buildConfig.livePort,
     webConfig() {
         let userWebConfig = {}
         delete require.cache[requireWebConfigPath]
@@ -53,11 +56,7 @@ const finalConfig = {
         const defaultWebConfig = {
             paths: {},
             shim: {},
-            map: {
-                '*': {
-                    css: 'https://cdn.bootcss.com/require-css/0.1.10/css.min.js'
-                }
-            },
+            map: {},
             production: {}
         }
         let webConfig = _.merge(defaultWebConfig, userWebConfig)
