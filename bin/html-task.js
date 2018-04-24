@@ -152,7 +152,8 @@ const htmlTask = (
                                     });
                                 };
                             `
-                            node.attrs = { 'require-pack': '' }
+                            
+                            delete node.attrs.src
                             if (node.attrs['require-pack'] === 'onload') {
                                 node.content = `
                                 ${prependScriptContent}
@@ -180,6 +181,7 @@ const htmlTask = (
                             prependDistContent += definedRequireCss + '\n'
 
                             prependDistContent += `require.config(REQUIRE_CONFIG);\n`
+
                             return fse.outputFile(
                                 file,
                                 prependDistContent + distJsContent
