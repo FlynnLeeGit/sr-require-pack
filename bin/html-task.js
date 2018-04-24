@@ -124,14 +124,25 @@ const htmlTask = (
                                 prependScriptContent += `window.GIT = {branch:"${gitBranch}",commit:"${gitCommit}"};`
                             }
 
-                            prependScriptContent += `
-                                if(process.env.NODE_ENV==='development'){
-                                    var s= document.createElement('script');
-                                    s.src = '//localhost:35729/livereload.js';
+                            prependScriptContent+=`
+                                function $injectScript(src,attrs,cb){
+                                    var s = document.createElement('script');
+                                    s.src = src;
+                                    for(let attr in attrs){
+                                        s.setAttribute(attr,attrs[attr]);
+                                    }
                                     document.head.appendChild(s);
                                     s.onload = function(){
-                                        console.log('[development mode] livereload is running...')
+                                        cb && cb();
                                     };
+                                };
+                            `
+
+                            prependScriptContent += `
+                                if(process.env.NODE_ENV==='development'){
+                                    $injectScript('//localhost:35729/livereload.js',{},function(){
+                                        console.log('[development mode] livereload is running...');
+                                    });
                                 };
                             `
                             node.attrs = { 'require-pack': '' }
@@ -139,19 +150,13 @@ const htmlTask = (
                                 node.content = `
                                 ${prependScriptContent}
                                 window.onload = function(){
-                                    var s = document.createElement('script');
-                                    s.src = '${requirejs}';
-                                    s.setAttribute('data-main','${mainUrl}');
-                                    document.head.appendChild(s);
+                                    $injectScript('${requirejs}',{'data-main':'${mainUrl}'});
                                 };
                             `
                             } else {
                                 node.content = `
                                     ${prependScriptContent}
-                                    var s = document.createElement('script');
-                                    s.src = '${requirejs}';
-                                    s.setAttribute('data-main','${mainUrl}');
-                                    document.head.appendChild(s);
+                                    $injectScript('${requirejs}',{'data-main':'${mainUrl}'});
                                 `
                             }
 
