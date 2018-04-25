@@ -120,7 +120,7 @@ const htmlTask = (
                             window.process.env.NODE_ENV = '${
                                 process.env.NODE_ENV
                             }';
-                            window.REQUIREQUIRE_CONFIG = ${JSON.stringify(
+                            window.REQUIRE_CONFIG = ${JSON.stringify(
                                 requireConfig
                             )};
                             `
