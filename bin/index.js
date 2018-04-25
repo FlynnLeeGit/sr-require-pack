@@ -49,8 +49,9 @@ const execWholeTask = livePort => {
 
 const runDev = port => {
     const liveServer = livereload.createServer({
-        delay: 200,
-        port
+        delay: 50,
+        port,
+        // debug:true
     })
     console.log('liveReload on ', port)
     liveServer.watch(env.DIST_DIR)

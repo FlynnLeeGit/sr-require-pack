@@ -62,7 +62,7 @@ const htmlTask = (
         outputOptions: {
             format: 'amd',
             paths: rollupPaths,
-            sourceMap: true
+            // sourceMap: true
         }
     }
     if (isProd) {
@@ -86,7 +86,7 @@ const htmlTask = (
                         fse.readFileSync(input, { encoding: 'utf-8' })
                     )
 
-                    const file = getDistname({
+                    const distpath = getDistname({
                         name: relativeEntry,
                         hash,
                         ext: ext,
@@ -97,14 +97,16 @@ const htmlTask = (
                     rollupConfig.inputOptions.onwarn = function(warning) {
                         console.warn(warning.message, '->', input)
                     }
-                    rollupConfig.outputOptions.file = file
 
                     const rollupTask = rollup
                         .rollup(rollupConfig.inputOptions)
                         .then(bundle =>
-                            bundle.write(rollupConfig.outputOptions)
+                            bundle.generate(rollupConfig.outputOptions)
                         )
-                        .then(() => {
+                        .then((ret) => {
+                            // console.log(ret.code)
+                            let distJsContent = ret.code
+
                             const mainUrl = getUrl({
                                 name: relativeEntry,
                                 hash,
@@ -118,7 +120,7 @@ const htmlTask = (
                             window.process.env.NODE_ENV = '${
                                 process.env.NODE_ENV
                             }';
-                            window.REQUIRE_CONFIG = ${JSON.stringify(
+                            window.REQUIREQUIRE_CONFIG = ${JSON.stringify(
                                 requireConfig
                             )};
                             `
@@ -152,7 +154,7 @@ const htmlTask = (
                                     });
                                 };
                             `
-                            
+
                             delete node.attrs.src
                             if (node.attrs['require-pack'] === 'onload') {
                                 node.content = `
@@ -168,9 +170,6 @@ const htmlTask = (
                                 `
                             }
 
-                            const distJsContent = fse.readFileSync(file, {
-                                encoding: 'utf-8'
-                            })
                             let prependDistContent = ''
 
                             for (let externalName in requireExternal) {
@@ -182,8 +181,8 @@ const htmlTask = (
 
                             prependDistContent += `require.config(REQUIRE_CONFIG);\n`
 
-                            return fse.outputFile(
-                                file,
+                            return ensureOutputFile(
+                                distpath,
                                 prependDistContent + distJsContent
                             )
                         })
@@ -210,7 +209,7 @@ const htmlTask = (
         .process(fse.readFileSync(srcFile, { encoding: 'utf-8' }))
         .then(ret => {
             const entry = getEntry(srcFile, SRC_DIR)
-            return fse.outputFile(
+            return ensureOutputFile(
                 getDistname({
                     name: entry,
                     tpl: '[name].html',
