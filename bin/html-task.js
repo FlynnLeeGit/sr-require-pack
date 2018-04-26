@@ -49,6 +49,10 @@ const htmlTask = (
                     insert: true,
                     output(css, file) {
                         return generateCssContent(css, Path.dirname(file))
+                    },
+                    options:{
+                        strictMath: true,
+                        relativeUrls: true
                     }
                 }),
                 rollupVue({
