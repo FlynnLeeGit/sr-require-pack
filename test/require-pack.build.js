@@ -3,5 +3,5 @@ module.exports = {
     distDir: './dist',
     html:'src/**/*.html',
     publicUrl: '/',
-    livePort: 0
+    livePort: 0,
 }

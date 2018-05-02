@@ -29,6 +29,7 @@
     "rollup-plugin-less": "^0.1.4",
     "rollup-plugin-uglify": "^3.0.0",
     "rollup-plugin-vue": "^3.0.0",
+    "serve": "^6.5.6",
     "vue-template-compiler": "^2.5.16",
     "yargs": "^11.0.0"
   }

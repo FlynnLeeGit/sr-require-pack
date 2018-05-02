@@ -1,63 +1,40 @@
 ## RequirePack
 
-amd format module's bundle tool
+bundle tool use requirejs
 
-
-
-### use
+## intall
 ```
-├── require-pack.build.js
-├── require-pack.web.js
-├── src
-│   ├── index.html
-│   ├── index.js
-│   ├── index.less
+npm install -g sr-require-pack
 ```
 
+## init
+after installed, you can use 'rpack' command
+```shell
+# init with
+rpack init
+
+## this command will auto generate 'require-pack.web.js' && 'require-pack.build.js'
+
+
+mkdir src
+cd src && touch index.html
+```
+
+In Src Folder,we create a index.html and a index.js file
 index.html
 ```html
- <script require-pack' src="./index.js"></script>
-
+<script require-pack src='./index.js'>
 ```
 
-
-#### require-pack.build.js
-define how to build
+index.js
 ```js
-module.exports = {
-    // project source dir
-    srcDir: './src',
-    // dist folder
-    distDir: './dist',
-
-    publicUrl: '/',
-    // requirejs file url,now only support remote url
-    requirejs: 'http://path/to/require.js'
-}
+console.log(1)
 ```
 
-#### require-pack.web.js
 
-define requirejs config,it extends the standard requirejs config
 
-```js
-module.exports = {
-    // external modules's alias,define js and css file here
-    paths: {
-        //module from node_modules,be sure it is browser format file
-        vue: 'vue/dist/vue',
-        // relative path module
-        fancybox: '../js/component/fancybox.js',
-        fancybox_css: '../css/component/fancybox.css',
-        jquery: 'http://path/to/jquery.js'
-    },
-    // define module's deps relation map,like requirejs shim config
-    shim: {
-        //
-        fancybox: ['jquery'],
-        fancybox: {
-            deps: ['jquery']
-        }
-    }
-}
-```
+
+
+
+
+
