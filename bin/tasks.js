@@ -215,6 +215,7 @@ const bundleExternal = async () => {
         ...Object.keys(cssPaths),
         ...Object.keys(externalPaths)
     ]
+    process.REQUIRE_PACK.rollupPaths = cssPaths
     process.REQUIRE_PACK.externalDefine = externalDefine
     debug.end('bundleExternal')
 }

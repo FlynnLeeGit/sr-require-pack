@@ -74,6 +74,7 @@ class JsAsset extends Asset {
         return {
             format: 'amd',
             file: this.distpath,
+            paths: REQUIRE_PACK.rollupPaths,
             sourcemap: true
         }
     }
