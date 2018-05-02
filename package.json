@@ -32,5 +32,8 @@
     "serve": "^6.5.6",
     "vue-template-compiler": "^2.5.16",
     "yargs": "^11.0.0"
+  },
+  "devDependencies": {
+    "clean-css": "^4.1.11"
   }
 }

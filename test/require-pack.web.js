@@ -11,7 +11,8 @@ module.exports = {
     },
     production: {
         paths: {
-            vue: 'vue/dist/vue.min'
+            vue: 'vue/dist/vue.min',
+            'babel-polyfill': 'babel-polyfill/dist/polyfill.min.js'
         }
     }
 }
