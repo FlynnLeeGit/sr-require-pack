@@ -5,6 +5,7 @@ class RawAsset extends Asset {
     constructor(options) {
         super(options)
         this.encoding = ''
+        this.autoWatch = false
         this.filename = REQUIRE_PACK.buildConfig.filename.res
     }
     rawTransform(content) {

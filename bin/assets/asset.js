@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const _ = require('lodash')
 const debug = require('../debug')
 const Mime = require('mime-types')
-const { md5, isBase64 } = require('../utils')
+const { md5, isBase64, isRemote } = require('../utils')
 
 const REQUIRE_PACK = process.REQUIRE_PACK
 
@@ -124,6 +124,12 @@ class Asset {
 
     // @return depAssert instance
     addDep({ name, parserType, autoWatch, autoLoad, autoOutput, content }) {
+        if (!name) {
+            debug.error('Asset.addDep should passs {name}')
+        }
+        if (!parserType) {
+            debug.error('Asset.addDep should pass {parserType}')
+        }
         // use
         const depKey = name + '->' + parserType
         if (this.deps.get(depKey)) {

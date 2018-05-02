@@ -1,34 +1,35 @@
 {
-    "name": "sr-require-pack",
-    "version": "0.2.0",
-    "scripts": {
-        "link": "node link.js",
-        "pub": "npm version patch && npm publish && git push"
-    },
-    "bin": {
-        "rpack": "./bin/index.js"
-    },
-    "dependencies": {
-        "livereload": "^0.7.0",
-        "rollup-plugin-vue": "^3.0.0",
-        "yargs": "^11.0.0",
-        "babel": "^6.23.0",
-        "babel-core": "^6.26.0",
-        "chalk": "^2.4.0",
-        "chokidar": "^2.0.3",
-        "fs-extra": "^5.0.0",
-        "glob": "^7.1.2",
-        "gulp": "^3.9.1",
-        "gulp-watch": "^5.0.0",
-        "mime-types": "^2.1.18",
-        "posthtml": "^0.11.3",
-        "posthtml-parser": "^0.4.1",
-        "posthtml-render": "^1.1.3",
-        "rollup": "^0.58.2",
-        "rollup-plugin-babel": "^3.0.4",
-        "rollup-plugin-css": "^1.0.10",
-        "rollup-plugin-less": "^0.1.4",
-        "rollup-plugin-uglify": "^3.0.0",
-        "vue-template-compiler": "^2.5.16"
-    }
+  "name": "sr-require-pack",
+  "version": "0.2.0",
+  "scripts": {
+    "link": "node link.js",
+    "pub": "npm version patch && npm publish && git push"
+  },
+  "bin": {
+    "rpack": "./bin/index.js"
+  },
+  "dependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.0",
+    "chalk": "^2.4.0",
+    "chokidar": "^2.0.3",
+    "fancybox": "^2.1.5",
+    "fs-extra": "^5.0.0",
+    "glob": "^7.1.2",
+    "gulp": "^3.9.1",
+    "gulp-watch": "^5.0.0",
+    "livereload": "^0.7.0",
+    "mime-types": "^2.1.18",
+    "posthtml": "^0.11.3",
+    "posthtml-parser": "^0.4.1",
+    "posthtml-render": "^1.1.3",
+    "rollup": "^0.58.2",
+    "rollup-plugin-babel": "^3.0.4",
+    "rollup-plugin-css": "^1.0.10",
+    "rollup-plugin-less": "^0.1.4",
+    "rollup-plugin-uglify": "^3.0.0",
+    "rollup-plugin-vue": "^3.0.0",
+    "vue-template-compiler": "^2.5.16",
+    "yargs": "^11.0.0"
+  }
 }

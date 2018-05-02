@@ -7,6 +7,7 @@ const Asset = require('./asset')
 const _ = require('lodash')
 const Fse = require('fs-extra')
 const debug = require('../debug')
+const { isRemote } = require('../utils')
 
 const injectTpl = Fse.readFileSync(__dirname + '/html/inject.ejs', {
     encoding: 'utf-8'
@@ -30,6 +31,7 @@ class HtmlAsset extends Asset {
         let hasPackScript = false
 
         this.ast.walk(node => {
+            // js
             if (
                 node.tag === 'script' &&
                 node.attrs &&
@@ -67,25 +69,73 @@ class HtmlAsset extends Asset {
                     )
                 }
             }
+
+            // style
             if (
                 node.tag === 'link' &&
                 node.attrs.rel === 'stylesheet' &&
                 'require-pack' in node.attrs
             ) {
                 const name = node.attrs.href
-                if (/\.css$/.test(name)) {
-                    const cssAsset = this.addDep({ name, parserType: 'css' })
+                if (!isRemote(name)) {
+                    if (/\.css$/.test(name)) {
+                        const cssAsset = this.addDep({
+                            name,
+                            parserType: 'css'
+                        })
+                        tasks.push(
+                            cssAsset.process().then(() => {
+                                node.attrs.href = cssAsset.disturl
+                            })
+                        )
+                    }
+                    if (/\.less$/.test(name)) {
+                        const lessAsset = this.addDep({
+                            name,
+                            parserType: 'less'
+                        })
+                        tasks.push(
+                            lessAsset.process().then(() => {
+                                node.attrs.href = lessAsset.disturl
+                            })
+                        )
+                    }
+                }
+            }
+            // a
+            if (
+                node.tag === 'a' &&
+                node.attrs.href &&
+                'require-pack' in node.attrs
+            ) {
+                const href = node.attrs.href
+                if (!isRemote(href)) {
+                    const rawAsset = this.addDep({
+                        name: href,
+                        parserType: 'raw'
+                    })
                     tasks.push(
-                        cssAsset.process().then(() => {
-                            node.attrs.href = cssAsset.disturl
+                        rawAsset.process().then(() => {
+                            node.attrs.href = rawAsset.disturl
                         })
                     )
                 }
-                if (/\.less$/.test(name)) {
-                    const lessAsset = this.addDep({ name, parserType: 'less' })
+            }
+            //img
+            if (
+                node.tag === 'img' &&
+                node.attrs.src &&
+                'require-pack' in node.attrs
+            ) {
+                const src = node.attrs.src
+                if (!isRemote(src)) {
+                    const rawAsset = this.addDep({
+                        name: src,
+                        parserType: 'raw'
+                    })
                     tasks.push(
-                        lessAsset.process().then(() => {
-                            node.attrs.href = lessAsset.disturl
+                        rawAsset.process().then(() => {
+                            node.attrs.src = rawAsset.disturl
                         })
                     )
                 }
