@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "fancybox": "^2.1.5",
+    "vue": "^2.5.16"
+  },
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "fancybox": "^2.1.5"
+  }
+}
