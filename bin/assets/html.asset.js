@@ -68,13 +68,22 @@ class HtmlAsset extends Asset {
                 if (node.attrs.rel === 'stylesheet') {
                     const href = node.attrs.href
                     if (!isRemote(href)) {
-                        const rawAsset = this.addDep({
-                            name: href,
-                            parserType: 'raw'
-                        })
+                        let styleAsset
+                        if (/\.css$/.test(href)) {
+                            styleAsset = this.addDep({
+                                name: href,
+                                parserType: 'css'
+                            })
+                        }
+                        if (/\.less$/.test(href)) {
+                            styleAsset = this.addDep({
+                                name: href,
+                                parserType: 'less'
+                            })
+                        }
                         this.transformTasks.push(
-                            rawAsset.process().then(() => {
-                                node.attrs.href = rawAsset.disturl
+                            styleAsset.process().then(() => {
+                                node.attrs.href = styleAsset.disturl
                             })
                         )
                     }
