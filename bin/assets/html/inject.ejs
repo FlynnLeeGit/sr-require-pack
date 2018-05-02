@@ -1,0 +1,41 @@
+<% if(true) { %>
+var $__injectScript__ = function (attrs, cb) {
+    var s = document.createElement('script');
+    for (var k in attrs) {
+        s.setAttribute(k, attrs[k]);
+    }
+    document.head.appendChild(s);
+    s.onload = function () {
+        cb && cb();
+    }
+};
+
+window.process = window.process || {};
+window.process.env = window.process.env || {};
+window.process.env.NODE_ENV = '<%= NODE_ENV %>';
+window.GIT = <%= GIT %>;
+window.REQUIRE_CONFIG = <%= requireConfig %>;
+
+<% } %>
+
+<% if(NODE_ENV === 'development') { %>
+    var __require_start__ = new Date().getTime();
+    $__injectScript__({src:'http://localhost:<%= livePort %>/livereload.js'},function(){
+        console.log('[require-pack] liveReload is running on port <%= livePort %>');
+    });
+<% } %>
+
+<% if(isOnload) { %>
+    window.addEventListener('load', function () {
+<% } %>
+        $__injectScript__({src: '<%= runtimeUrl %>' },function(){
+            require.config(REQUIRE_CONFIG);
+            <%= externalDefine %>
+            <% if(NODE_ENV === 'development') { %>
+                console.log('[require-pack] load', new Date().getTime() - __require_start__,'ms');
+            <% } %>
+            require([ '<%= mainUrl %>' ]);
+        });
+<% if(isOnload) { %>
+    });
+<% } %>

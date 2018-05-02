@@ -14,6 +14,12 @@ amd format module's bundle tool
 │   ├── index.less
 ```
 
+index.html
+```html
+ <script require-pack' src="./index.js"></script>
+
+```
+
 
 #### require-pack.build.js
 define how to build
