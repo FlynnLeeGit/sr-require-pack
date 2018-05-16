@@ -1,10 +1,14 @@
 import 'babel-polyfill'
 import Vue from 'vue'
+import Vuex from 'vuex'
+import VueRouter from 'vue-router'
+import 'fancybox'
 
-// import 'fancybox'
-import 'fancybox_css'
+Vue.use(VueRouter)
 
-// $('.fancy').fancybox()
+Vue.use(Vuex)
+
+$('.fancy').fancybox()
 
 new Vue({
     el: '#app',

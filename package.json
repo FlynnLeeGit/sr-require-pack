@@ -30,10 +30,12 @@
     "rollup-plugin-uglify": "^3.0.0",
     "rollup-plugin-vue": "^3.0.0",
     "serve": "^6.5.6",
+    "uglify-js": "^3.3.23",
     "vue-template-compiler": "^2.5.16",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "clean-css": "^4.1.11"
   }
 }

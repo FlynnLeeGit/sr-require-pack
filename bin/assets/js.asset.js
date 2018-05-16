@@ -27,13 +27,7 @@ class JsAsset extends Asset {
             input: this.path,
             external: REQUIRE_PACK.rollupExternal,
             onwarn: e => {
-                if (
-                    e.code === 'UNRESOLVED_IMPORT' &&
-                    REQUIRE_PACK.rollupExternal.indexOf(e.source) > -1
-                ) {
-                    return
-                }
-                debug.warn(this.relname, '->', e.message)
+                debug.warn(this.relname, '->', e)
             },
             plugins: [
                 less({
@@ -78,36 +72,46 @@ class JsAsset extends Asset {
             sourcemap: true
         }
     }
+    get watchOptions() {
+        return {
+            ...this.rollupInput,
+            output: [this.rollupOutput]
+        }
+    }
+    setRollupWatcher() {
+        this.rollupWatcher && this.rollupWatcher.close()
+        REQUIRE_PACK.isUpdatingConfig = false
+        this.rollupWatcher = rollup.watch(this.watchOptions)
+        this.rollupWatcher.on('event', async e => {
+            if (e.code === 'BUNDLE_END') {
+                debug.log(this.relname, 'outputed')
+                await this.root.process()
+            }
+            if (e.code === 'ERROR') {
+                debug.error(this.relname, '->', e)
+            }
+            if (e.code === 'FATAL') {
+                debug.error(this.relname, '->', e)
+            }
+        })
+    }
+
     async transform(code) {
+        // development mode,rollup watch mode
         if (IS_DEV) {
-            // already watch
-            if (this.rollupWatcher) {
+            // already has watcher
+            if (this.rollupWatcher && !REQUIRE_PACK.isUpdatingConfig) {
                 const distContent = await Fse.readFile(this.distpath, {
                     encoding: this.encoding
                 })
                 return distContent
             } else {
-                const watchOptions = {
-                    ...this.rollupInput,
-                    output: [this.rollupOutput]
-                }
-                this.rollupWatcher = rollup.watch(watchOptions)
-                this.rollupWatcher.on('event', async e => {
-                    if (e.code === 'BUNDLE_END') {
-                        debug.log(this.relname, 'outputed')
-                        await this.root.process()
-                    }
-                    if (e.code === 'ERROR') {
-                        debug.error(this.relname, '->', e)
-                    }
-                    if (e.code === 'FATAL') {
-                        debug.error(this.relname, '->', e)
-                    }
-                })
+                this.setRollupWatcher()
                 return code
             }
         }
 
+        // production just output
         if (IS_PROD) {
             const bundle = await rollup.rollup(this.rollupInput)
             const ret = await bundle.write(this.rollupOutput)

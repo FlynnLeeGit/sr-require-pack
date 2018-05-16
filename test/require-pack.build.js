@@ -1,7 +1,7 @@
 module.exports = {
-    srcDir: './src',
-    distDir: './dist',
-    html:'src/**/*.html',
-    publicUrl: '/',
-    livePort: 0,
+  srcDir: './src',
+  distDir: './dist',
+  html: 'src/**/*.html',
+  publicUrl: '/',
+  livePort: 0
 }

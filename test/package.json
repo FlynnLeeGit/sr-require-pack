@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "fancybox": "^2.1.5",
-    "vue": "^2.5.16"
+    "vue": "^2.5.16",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
