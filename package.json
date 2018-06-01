@@ -37,7 +37,6 @@
     "yargs": "^11.0.0"
   },
   "devDependencies": {
-    "cheerio": "^1.0.0-rc.2",
     "clean-css": "^4.1.11",
     "rollup-plugin-postcss": "^1.6.1"
   }

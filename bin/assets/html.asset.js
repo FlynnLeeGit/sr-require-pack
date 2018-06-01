@@ -4,7 +4,6 @@ const htmlRender = require('posthtml-render')
 const posthtml = require('posthtml')
 const posthtmlExtend = require('./html/posthtml-extend')
 const chokidar = require('chokidar')
-const cheerio = require('cheerio')
 
 const Asset = require('./asset')
 const UglifyJs = require('uglify-js')
