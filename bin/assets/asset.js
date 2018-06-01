@@ -10,13 +10,13 @@ const { md5, isBase64, isRemote } = require('../utils')
 
 const REQUIRE_PACK = process.REQUIRE_PACK
 
-
 class Asset {
   constructor({
     name,
     parent = null,
     depKey,
     content = '',
+
     autoLoad = true,
     autoWatch = true,
     autoOutput = true
