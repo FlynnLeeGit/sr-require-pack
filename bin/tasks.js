@@ -39,6 +39,7 @@ const initBuildConfig = async () => {
     debug.error(`${BUILD_NAME} is missing`)
   }
   const userBuildConfig = require(Path.resolve(BUILD_NAME))
+  const IS_PROD = process.env.NODE_ENV === 'production'
   const defaultBuildConfig = {
     srcDir: './src',
     distDir: './dist',
@@ -47,9 +48,15 @@ const initBuildConfig = async () => {
     // 默认是随机端口
     livePort: 0,
     filename: {
-      js: '_static/js/[name].[ext]?[hash:8]',
-      css: '_static/css/[name].[ext]?[hash:8]',
-      res: '_static/res/[name].[hash:8].[ext]',
+      js: IS_PROD
+        ? '_static/js/[name].[hash:8].[ext]'
+        : '_static/js/[name].[ext]?[hash:8]',
+      css: IS_PROD
+        ? '_static/css/[name].[hash:8].[ext]'
+        : '_static/js/[name].[ext]?[hash:8]',
+      res: IS_PROD
+        ? '_static/res/[name].[hash:8].[ext]'
+        : '_static/js/[name].[ext]?[hash:8]',
       jsChunk: '_static/js/chunk/[name].[hash:8].[ext]',
       cssChunk: '_static/css/chunk/[name].[hash:8].[ext]',
       resChunk: '_static/res/chunk/[name].[hash:8].[ext]',

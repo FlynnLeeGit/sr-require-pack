@@ -24,7 +24,6 @@ class JsAsset extends Asset {
     this.type = 'js'
     this.filename = REQUIRE_PACK.buildConfig.filename.js
     this.autoWatch = false
-    this.autoOutput = false
   }
   get rollupInput() {
     return {
@@ -108,6 +107,7 @@ class JsAsset extends Asset {
   async transform(code) {
     // development mode,rollup watch mode
     if (IS_DEV) {
+      this.autoOutput = false
       // already has watcher
       if (this.rollupWatcher && !REQUIRE_PACK.isUpdatingConfig) {
         const distContent = await Fse.readFile(this.distpath, {
@@ -122,8 +122,9 @@ class JsAsset extends Asset {
 
     // production just output
     if (IS_PROD) {
+      this.autoOutput = true
       const bundle = await rollup.rollup(this.rollupInput)
-      const ret = await bundle.write(this.rollupOutput)
+      const ret = await bundle.generate(this.rollupOutput)
       return ret.code
     }
   }
