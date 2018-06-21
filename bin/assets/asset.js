@@ -89,6 +89,7 @@ class Asset {
     return this.filename
       .replace('[name]', this.entry)
       .replace(/\[hash:(\d+)\]/, (match, len) => this.hash.slice(0, +len))
+      .replace('[time]', Number.parseInt(Date.now() / 1000))
       .replace('[ext]', this.type)
   }
   get distpath() {
