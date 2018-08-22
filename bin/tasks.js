@@ -48,8 +48,8 @@ const initBuildConfig = async () => {
     livePort: 0,
     filename: {
       js: '_static/js/[name].[ext]?[hash:8]',
-      css: '_static/js/[name].[ext]?[hash:8]',
-      res: '_static/js/[name].[ext]?[hash:8]',
+      css: '_static/css/[name].[ext]?[hash:8]',
+      res: '_static/res/[name].[ext]?[hash:8]',
       jsChunk: '_static/js/chunk/[name].[hash:8].[ext]',
       cssChunk: '_static/css/chunk/[name].[hash:8].[ext]',
       resChunk: '_static/res/chunk/[name].[hash:8].[ext]',

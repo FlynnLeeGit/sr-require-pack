@@ -122,10 +122,15 @@ class JsAsset extends Asset {
 
     // production just output
     if (IS_PROD) {
-      this.autoOutput = true
+      this.autoOutput = false
       const bundle = await rollup.rollup(this.rollupInput)
-      const ret = await bundle.generate(this.rollupOutput)
-      return ret.code
+      // 先强行编译获取生成文件指纹
+      const { code} = await bundle.generate(this.rollupOutput)
+      this.transformContent = code
+      
+      // 再生成具体文件
+      await bundle.write(this.rollupOutput)
+      return code
     }
   }
 }
