@@ -6,6 +6,7 @@ const crypto = require('crypto')
 const _ = require('lodash')
 const debug = require('../debug')
 const Mime = require('mime-types')
+const normalizePath = require('normalize-path')
 const { md5, isBase64, isRemote } = require('../utils')
 
 const REQUIRE_PACK = process.REQUIRE_PACK
@@ -99,7 +100,7 @@ class Asset {
     if (isBase64(this.transformContent)) {
       return this.transformContent
     } else {
-      return `${REQUIRE_PACK.buildConfig.publicUrl}${this.distname}`
+      return `${REQUIRE_PACK.buildConfig.publicUrl}${normalizePath(this.distname)}`
     }
   }
   get disturl() {

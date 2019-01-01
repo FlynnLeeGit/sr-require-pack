@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "dev":"node ../bin/index dev"
+  },
   "dependencies": {
     "fancybox": "^2.1.5",
     "vue": "^2.5.16",

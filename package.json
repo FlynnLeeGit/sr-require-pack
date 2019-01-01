@@ -1,6 +1,6 @@
 {
   "name": "sr-require-pack",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "scripts": {
     "link": "node link.js",
     "pub": "npm version patch && npm publish && git push"
@@ -20,6 +20,7 @@
     "gulp-watch": "^5.0.0",
     "livereload": "^0.7.0",
     "mime-types": "^2.1.18",
+    "normalize-path": "^3.0.0",
     "posthtml": "^0.11.3",
     "posthtml-parser": "^0.4.1",
     "posthtml-render": "^1.1.3",
