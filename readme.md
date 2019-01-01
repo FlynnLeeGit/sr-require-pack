@@ -34,6 +34,7 @@ index.html content
 <html lang="en">
 
 <head>
+    <!-- resolve a link href -->
     <link rel="stylesheet" require-pack href="./index.less">
 </head>
 
@@ -42,6 +43,11 @@ index.html content
     <div id="app" v-cloak>
         hello {{ name }}
     </div>
+    <!-- resolve img -->
+    <img src='./images/logo.png' require-pack>
+    <!-- resolve a link resource -->
+    <a href='./images/logo.png' require-pack>
+    <!-- resolve a script src -->
     <script require-pack src="./index.js"></script>
 </body>
 
