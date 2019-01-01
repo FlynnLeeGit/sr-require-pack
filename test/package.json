@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev":"node ../bin/index dev"
+    "dev":"node ../bin/index dev",
+    "build":"node ../bin/index build"
   },
   "dependencies": {
     "fancybox": "^2.1.5",
