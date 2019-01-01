@@ -1,6 +1,6 @@
 {
   "name": "sr-require-pack",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "scripts": {
     "link": "node link.js",
     "pub": "npm version patch && npm publish && git push"

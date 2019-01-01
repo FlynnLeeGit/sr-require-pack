@@ -19,16 +19,18 @@ class LessAsset extends Asset {
             paths: [this.dir],
             sourceMap: {}
         })
-        // watch @import less files
-        output.imports.map(importLessPath => {
-            if (!this.lessWatcherPool[importLessPath]) {
-                const watcher = chokidar.watch(importLessPath)
-                this.lessWatcherPool[importLessPath] = true
-                watcher.on('change', () => {
-                    this.root.process()
-                })
-            }
-        })
+        if(process.env.NODE_ENV==='development'){
+            // watch @import less files
+            output.imports.map(importLessPath => {
+                if (!this.lessWatcherPool[importLessPath]) {
+                    const watcher = chokidar.watch(importLessPath)
+                    this.lessWatcherPool[importLessPath] = true
+                    watcher.on('change', () => {
+                        this.root.process()
+                    })
+                }
+            })
+        }
 
         const cssTransform = CssAsset.prototype.cssTransfrom
         const cssText = await cssTransform.call(this, output.css, 'raw')
