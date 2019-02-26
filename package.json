@@ -1,6 +1,6 @@
 {
   "name": "sr-require-pack",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "scripts": {
     "link": "node link.js",
     "pub": "npm version patch && npm publish && git push"
@@ -35,7 +35,6 @@
     "rollup-plugin-vue": "4.7.2",
     "serve": "6.5.6",
     "uglify-js": "3.3.23",
-    "vue-template-compiler": "^2.5.16",
     "yargs": "11.0.0"
   },
   "peerDependencies": {
