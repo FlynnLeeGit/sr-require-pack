@@ -4,11 +4,12 @@ const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 const less = require('rollup-plugin-less')
 const vuePlugin = require('rollup-plugin-vue')
-const uglify = require('rollup-plugin-uglify')
+const { uglify } = require('rollup-plugin-uglify')
 // const resolve = require('rollup-plugin-node-resolve')
-// const commonjs = require('rollup-plugin-commonjs')
+const commonjs = require('rollup-plugin-commonjs')
 // const postcss = require('rollup-plugin-postcss')
-const vue = vuePlugin.default || vuePlguin
+const vue = vuePlugin.default || vuePlugin
+
 const _ = require('lodash')
 const Fse = require('fs-extra')
 const debug = require('../debug')
@@ -34,7 +35,7 @@ class JsAsset extends Asset {
       },
       plugins: [
         // resolve(),
-        // commonjs(),
+        commonjs(),
         // postcss({
         //   extensions: ['.css']
         // }),
@@ -125,9 +126,9 @@ class JsAsset extends Asset {
       this.autoOutput = false
       const bundle = await rollup.rollup(this.rollupInput)
       // 先强行编译获取生成文件指纹
-      const { code} = await bundle.generate(this.rollupOutput)
+      const { code } = await bundle.generate(this.rollupOutput)
       this.transformContent = code
-      
+
       // 再生成具体文件
       await bundle.write(this.rollupOutput)
       return code
