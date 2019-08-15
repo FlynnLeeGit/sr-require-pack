@@ -1,4 +1,7 @@
 module.exports = {
+  /**
+   * 这个可以为函数
+   */
   paths: {
     'babel-polyfill': 'babel-polyfill/dist/polyfill.js',
     vue: 'vue/dist/vue',

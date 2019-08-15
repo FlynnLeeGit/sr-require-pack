@@ -6,6 +6,7 @@ class RequireRawAsset extends RawAsset {
         super(options)
         this.srcDir = this.dir
         this.filename = store.buildConfig.filename.resChunk
+        this.filenameCss = store.buildConfig.filename.cssChunk
     }
     transform(content) {
         return this.rawTransform(content)

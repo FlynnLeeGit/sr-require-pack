@@ -3,7 +3,10 @@ var $__injectScript__ = function (attrs, cb) { var s = document.createElement('s
 var process = process || {};process.env = process.env || {};process.env.NODE_ENV = '<%= NODE_ENV %>';
 var GIT = <%= GIT %>;
 var REQUIRE_CONFIG = <%= requireConfig %>;  <% } %>
-<% if(NODE_ENV === 'development') { %>console.log('[require-pack] dev mode') <% } %>
+// -------------------
+REQUIRE_CONFIG.baseUrl = window.__require_public_url__ ||  <%= PUBLIC_URL %>;
+// -------------------
+<% if(NODE_ENV === 'development') { %>console.log('[require-pack] dev mode,baseUrl is ',REQUIRE_CONFIG.baseUrl) <% } %>
 <% if(isOnload) { %>window.addEventListener('load', function () { <% } %>
     $__injectScript__({src: '<%= runtimeUrl %>' },function(){ require.config(REQUIRE_CONFIG); <%= externalDefine %> require([ '<%= mainEntry %>' ]); });
 <% if(isOnload) { %>}); <% } %>

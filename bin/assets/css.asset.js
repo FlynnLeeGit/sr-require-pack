@@ -1,6 +1,7 @@
 const Asset = require('./asset')
 const { isRemote } = require('../utils')
 const CleanCss = require('clean-css')
+
 const store = require('../store')
 const CSS_REQUIRE_REG = /url\(['"]?([^'"\(\)]+)['"]?\)/g
 const CLEAN_CSS_OPTS = {
@@ -13,6 +14,7 @@ class CssAsset extends Asset {
     super(options)
     this.type = 'css'
     this.filename = store.buildConfig.filename.css
+    
   }
   async cssTransfrom(code, parserType, { minifyInProd = true } = {}) {
     const tasks = []
@@ -26,7 +28,8 @@ class CssAsset extends Asset {
         })
         tasks.push(
           depAsset.process().then(() => {
-            replaceMap[r] = match.replace(r, depAsset.disturl)
+            // css资源的加载 使用相对路径
+            replaceMap[r] = match.replace(r, depAsset.rawDistUrl)
           })
         )
       }

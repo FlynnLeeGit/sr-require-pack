@@ -100,6 +100,7 @@ class HtmlAsset extends Asset {
               requireConfig.paths[mainEntry] = mainAsset.requireDistUrl
               const compiled = _.template(injectTpl)
               const jsContent = compiled({
+                PUBLIC_URL: JSON.stringify(store.buildConfig.publicUrl),
                 NODE_ENV: process.env.NODE_ENV,
                 GIT: JSON.stringify(store.GIT()),
                 requireConfig: JSON.stringify(requireConfig),
@@ -109,8 +110,8 @@ class HtmlAsset extends Asset {
                 isOnload: node.attrs['require-pack'] === 'onload'
               })
               delete node.attrs.src
-              const minifyCode = UglifyJs.minify(jsContent).code
-              node.content = minifyCode
+              // const minifyCode = UglifyJs.minify(jsContent).code
+              node.content = jsContent
 
             })
           )

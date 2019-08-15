@@ -97,12 +97,6 @@ class Asset {
     return 'emptyMd5'
   }
   /**
-   * the file directory relative to src directory 处理的文件所在的文件夹相对于src目录的相对文件夹
-   */
-  get reldir() {
-    return Path.relative(this.srcDir, this.dir)
-  }
-  /**
    * the file name relative to src directory 当前文件相对于src目录的相对文件路径
    */
   get relname() {
@@ -111,18 +105,21 @@ class Asset {
   get entry() {
     return Path.join(Path.dirname(this.relname), Path.parse(this.relname).name)
   }
-  get distname() {
-    return this.filename
+  calcDistname(filename = ''){
+    return filename
       .replace('[name]', this.entry)
       .replace(/\[hash:(\d+)\]/, (match, len) => this.hash.slice(0, +len))
       .replace('[time]', Number.parseInt(Date.now() / 1000))
-      .replace('[ext]', this.type)
+      .replace('[ext]', this.type) 
+  }
+  get distname() {
+    return this.calcDistname(this.filename)
   }
   get distpath() {
     return Path.join(Path.resolve(this.distDir), this.distname.split('?')[0])
   }
   /**
-   * 计算产出最终url地址 改地址由 buildConfig.publicUrl生成
+   * 计算产出最终url地址 该地址由 buildConfig.publicUrl生成
    */
   get disturl() {
     if (isBase64(this.transformContent)) {
@@ -131,27 +128,25 @@ class Asset {
       return `${store.buildConfig.publicUrl}${normalizePath(this.distname)}`
     }
   }
-  get disturlWithNoExt() {
-    return this.disturl.replace(this.extname, '')
-  }
-  /**
-   * 计算资源和publicCdnUrls合并的资源url数组
-   */
-  get distCdnUrls() {
-    return store.buildConfig.publicCdnUrls.map(
-      baseUrl => `${baseUrl}${normalizePath(this.distname)}`
-    )
-  }
   /**
    * requirejs 使用的paths路径
    */
   get requireDistUrl() {
-    return store.buildConfig.publicCdnUrls.length
-      ? this.distCdnUrlsWithNoExt.concat(this.disturlWithNoExt)
-      : this.disturlWithNoExt
-  }
-  get distCdnUrlsWithNoExt() {
-    return this.distCdnUrls.map(url => url.replace(this.extname, ''))
+    const requireUrlPath = normalizePath(this.distname).replace(
+      new RegExp(this.extname + '$'),
+      ''
+    )
+    if (!store.buildConfig.publicCdnUrls.length) {
+      return requireUrlPath
+    }
+    const requireCdnUrls = store.buildConfig.publicCdnUrls.map(
+      baseUrl =>
+        `${normalizePath(this.distname).replace(
+          new RegExp(this.extname + '$'),
+          ''
+        )}`
+    )
+    return requireCdnUrls
   }
   async load() {
     // 没有内容的情况下才加载文件内容
@@ -166,7 +161,7 @@ class Asset {
   // @return depAssert instance
   addDep({ name, parserType, autoWatch, autoLoad, autoOutput, content }) {
     if (!name) {
-      debug.error('Asset.addDep should passs {name}')
+      debug.error('Asset.addDep should pass {name}')
     }
     if (!parserType) {
       debug.error('Asset.addDep should pass {parserType}')
