@@ -17,8 +17,6 @@ const injectTpl = Fse.readFileSync(__dirname + '/html/inject.ejs', {
   encoding: 'utf-8'
 })
 
-
-
 class HtmlAsset extends Asset {
   constructor(options) {
     super(options)
@@ -44,9 +42,7 @@ class HtmlAsset extends Asset {
     const liveScriptNode = {
       tag: 'script',
       attrs: {
-        src: `http://localhost:${
-          store.buildConfig.livePort
-        }/livereload.js`
+        src: `http://localhost:${store.buildConfig.livePort}/livereload.js`
       }
     }
     let hasBody = false
@@ -93,8 +89,8 @@ class HtmlAsset extends Asset {
           // 将入口文件也纳入requirejs管理
           const mainAsset = this.addDep({ name, parserType: 'js' })
           const requireConfig = _.cloneDeep(store.requireConfig)
-          const mainEntry = `app-entry-${mainAsset.entry.replace('/', '-')}`
- 
+          const mainEntry = `app-entry-${mainAsset.entry.replace(/\//g, '-')}`
+
           this.transformTasks.push(
             mainAsset.process().then(() => {
               requireConfig.paths[mainEntry] = mainAsset.requireDistUrl
@@ -112,7 +108,6 @@ class HtmlAsset extends Asset {
               delete node.attrs.src
               // const minifyCode = UglifyJs.minify(jsContent).code
               node.content = jsContent
-
             })
           )
         }

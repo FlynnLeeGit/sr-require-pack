@@ -25,7 +25,7 @@ class RawAsset extends Asset {
     }
   }
   rawTransform(content) {
-    if (content.length < 5 * 1024) {
+    if (content.length < 8 * 1024) {
       this.autoOutput = false
       return `data:${this.mime};base64,${content.toString('base64')}`
     } else {
