@@ -64,10 +64,10 @@ import 'fancybox'
 $('.fancy').fancybox()
 
 new Vue({
-    el: '#app',
-    data: {
-        name: 'lee'
-    }
+  el: '#app',
+  data: {
+    name: 'lee'
+  }
 })
 ```
 
@@ -75,7 +75,7 @@ index.less content
 
 ```less
 body {
-    background: lightblue;
+  background: lightblue;
 }
 ```
 
@@ -109,18 +109,20 @@ rpack build
 
 ```js
 module.exports = {
-    // source folder
-    srcDir: './src',
-    // dest folder
-    distDir: './dist',
+  // source folder
+  srcDir: './src',
+  // dest folder
+  distDir: './dist',
 
-    // which html will be require-packed,support glob path
-    html: 'src/**/*.html',
-    // all asset public prefix url
-    publicUrl: '/',
+  // which html will be require-packed,support glob path
+  html: 'src/**/*.html',
+  // all asset public prefix url
+  publicUrl: '/',
+// use cdn publicUrls to fallback resources
+  publicCdnUrls:['//cdn1.cn/','//cdn2.cn/']
 
-    // development mode liveReload port ,0 means random port
-    livePort: 0
+  // development mode liveReload port ,0 means random port
+  livePort: 0
 }
 ```
 
@@ -130,23 +132,23 @@ this config file is extends standard requirejs config
 
 ```js
 module.exports = {
-    // all external module path map
+  // all external module path map
+  paths: {
+    vue: 'vue/dist/vue',
+    jquery: './lib/jquery.js',
+    fancybox: 'fancybox/dist/js/jquery.fancybox',
+    fancybox_css: 'fancybox/dist/css/jquery.fancybox.css'
+  },
+  // same as requirejs shim config,configure module dep relationships and exports
+  shim: {
+    fancybox: ['jquery', 'fancybox_css']
+  },
+  // production config,it will merge  basic config
+  production: {
     paths: {
-        vue: 'vue/dist/vue',
-        jquery: './lib/jquery.js',
-        fancybox: 'fancybox/dist/js/jquery.fancybox',
-        fancybox_css: 'fancybox/dist/css/jquery.fancybox.css'
-    },
-    // same as requirejs shim config,configure module dep relationships and exports
-    shim: {
-        fancybox: ['jquery', 'fancybox_css']
-    },
-    // production config,it will merge  basic config
-    production: {
-        paths: {
-            vue: 'vue/dist/vue.min',
-            'babel-polyfill': 'babel-polyfill/dist/polyfill.min.js'
-        }
+      vue: 'vue/dist/vue.min',
+      'babel-polyfill': 'babel-polyfill/dist/polyfill.min.js'
     }
+  }
 }
 ```

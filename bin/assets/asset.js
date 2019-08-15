@@ -147,7 +147,7 @@ class Asset {
    */
   get requireDistPaths() {
     return store.buildConfig.publicCdnUrls.length
-      ? this.distCdnUrlsWithNoExt
+      ? this.distCdnUrlsWithNoExt.concat(this.disturlWithNoExt)
       : this.disturlWithNoExt
   }
   get distCdnUrlsWithNoExt() {
