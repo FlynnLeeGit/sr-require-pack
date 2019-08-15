@@ -67,7 +67,7 @@ class JsAsset extends Asset {
         babel({
           exclude: 'node_modules/**'
         }),
-        IS_PROD && uglify()
+        IS_PROD() && uglify()
       ]
     }
   }
@@ -120,7 +120,7 @@ class JsAsset extends Asset {
     }
 
     // production just output
-    if (IS_PROD) {
+    if (IS_PROD()) {
       this.autoOutput = false
       const bundle = await rollup.rollup(this.rollupInput)
       // 先强行编译获取生成文件指纹

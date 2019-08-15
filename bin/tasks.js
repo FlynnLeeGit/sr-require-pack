@@ -144,7 +144,7 @@ const bundleExternal = async () => {
           const rjsAsset = new RjsCtor({ name: modulePath })
           tasks.push(
             rjsAsset.process().then(() => {
-              jsPaths[key] = rjsAsset.requireDistPaths
+              jsPaths[key] = rjsAsset.requireDistUrl
             })
           )
           break
@@ -153,7 +153,7 @@ const bundleExternal = async () => {
           const rcssAsset = new RcssCtor({ name: modulePath })
           tasks.push(
             rcssAsset.process().then(() => {
-              cssPaths[key] = rcssAsset.requireDistPaths
+              cssPaths[key] = rcssAsset.requireDistUrl
             })
           )
           break

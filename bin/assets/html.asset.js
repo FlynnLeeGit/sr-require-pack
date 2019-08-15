@@ -94,11 +94,10 @@ class HtmlAsset extends Asset {
           const mainAsset = this.addDep({ name, parserType: 'js' })
           const requireConfig = _.cloneDeep(store.requireConfig)
           const mainEntry = `app-entry-${mainAsset.entry.replace('/', '-')}`
-          requireConfig.paths[mainEntry] =
-            mainAsset.requireDistPaths
-
+ 
           this.transformTasks.push(
             mainAsset.process().then(() => {
+              requireConfig.paths[mainEntry] = mainAsset.requireDistUrl
               const compiled = _.template(injectTpl)
               const jsContent = compiled({
                 NODE_ENV: process.env.NODE_ENV,
