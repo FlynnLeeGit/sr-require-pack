@@ -2,14 +2,12 @@ const Fse = require('fs-extra')
 const Path = require('path')
 
 const chokidar = require('chokidar')
-const crypto = require('crypto')
 const _ = require('lodash')
 const debug = require('../debug')
 const Mime = require('mime-types')
 const normalizePath = require('normalize-path')
 const { md5, isBase64, isRemote } = require('../utils')
-
-const REQUIRE_PACK = process.REQUIRE_PACK
+const store = require('../store')
 
 class Asset {
   constructor({
@@ -34,9 +32,9 @@ class Asset {
     this.autoWatch = autoWatch
     this.autoOutput = autoOutput
 
-    this.srcDir = REQUIRE_PACK.buildConfig.srcDir
-    this.distDir = REQUIRE_PACK.buildConfig.distDir
-    this.publicUrl = REQUIRE_PACK.buildConfig.publicUrl
+    this.srcDir = store.buildConfig.srcDir
+    this.distDir = store.buildConfig.distDir
+    this.publicUrl = store.buildConfig.publicUrl
 
     this.transformContent = ''
 
@@ -46,6 +44,9 @@ class Asset {
 
     return this
   }
+  /**
+   * the absolute filepath of src File 依赖文件的绝对路径地址
+   */
   get path() {
     if (this.parent) {
       // absolute path just return,if releative path join parent and child path
@@ -68,18 +69,42 @@ class Asset {
     findRoot(this)
     return _root
   }
+  /**
+   * the mimeType of file 文件mimeType类型 application/javascript 等
+   */
   get mime() {
     return Mime.lookup(this.path)
   }
+  /**
+   * the Directory of file 依赖文件的来源文件夹绝对地址
+   */
   get dir() {
     return Path.dirname(this.path)
   }
+  /**
+   *  file's extname with '.' 文件的后缀名路径 带有'.'
+   */
+  get extname() {
+    return Path.extname(this.name)
+  }
+  /**
+   * file's content hash 产出文件的内容hash
+   */
   get hash() {
     if (this.transformContent) {
       return md5(this.transformContent)
     }
     return 'emptyMd5'
   }
+  /**
+   * the file directory relative to src directory 处理的文件所在的文件夹相对于src目录的相对文件夹
+   */
+  get reldir() {
+    return Path.relative(this.srcDir, this.dir)
+  }
+  /**
+   * the file name relative to src directory 当前文件相对于src目录的相对文件路径
+   */
   get relname() {
     return Path.relative(this.srcDir, this.path)
   }
@@ -96,15 +121,37 @@ class Asset {
   get distpath() {
     return Path.join(Path.resolve(this.distDir), this.distname.split('?')[0])
   }
-  get calcDistUrl() {
+  /**
+   * 计算产出最终url地址 改地址由 buildConfig.publicUrl生成
+   */
+  get disturl() {
     if (isBase64(this.transformContent)) {
       return this.transformContent
     } else {
-      return `${REQUIRE_PACK.buildConfig.publicUrl}${normalizePath(this.distname)}`
+      return `${store.buildConfig.publicUrl}${normalizePath(this.distname)}`
     }
   }
-  get disturl() {
-    return this.calcDistUrl
+  get disturlWithNoExt() {
+    return this.disturl.replace(this.extname, '')
+  }
+  /**
+   * 计算资源和publicCdnUrls合并的资源url数组
+   */
+  get distCdnUrls() {
+    return store.buildConfig.publicCdnUrls.map(
+      baseUrl => `${baseUrl}${normalizePath(this.distname)}`
+    )
+  }
+  /**
+   * requirejs 使用的paths路径
+   */
+  get requireDistPaths() {
+    return store.buildConfig.publicCdnUrls.length
+      ? this.distCdnUrlsWithNoExt
+      : this.disturlWithNoExt
+  }
+  get distCdnUrlsWithNoExt() {
+    return this.distCdnUrls.map(url => url.replace(this.extname, ''))
   }
   async load() {
     // 没有内容的情况下才加载文件内容
@@ -131,7 +178,7 @@ class Asset {
       return this.deps.get(depKey)
     } else {
       // console.log('新增依赖', depKey)
-      const AssetCtor = REQUIRE_PACK.parser.get(parserType)
+      const AssetCtor = store.parser.get(parserType)
       return new AssetCtor({
         name,
         parent: this,

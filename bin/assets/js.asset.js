@@ -14,22 +14,20 @@ const _ = require('lodash')
 const Fse = require('fs-extra')
 const debug = require('../debug')
 const Path = require('path')
-
-const REQUIRE_PACK = process.REQUIRE_PACK
-const IS_DEV = process.env.NODE_ENV === 'development'
-const IS_PROD = process.env.NODE_ENV === 'production'
+const store = require('../store')
+const { IS_DEV, IS_PROD } = require('../store')
 
 class JsAsset extends Asset {
   constructor(options) {
     super(options)
     this.type = 'js'
-    this.filename = REQUIRE_PACK.buildConfig.filename.js
+    this.filename = store.buildConfig.filename.js
     this.autoWatch = false
   }
   get rollupInput() {
     return {
       input: this.path,
-      external: REQUIRE_PACK.rollupExternal,
+      external: store.rollupExternal,
       onwarn: e => {
         debug.warn(this.relname, '->', e)
       },
@@ -43,7 +41,7 @@ class JsAsset extends Asset {
           // less 本身添加相对路径
           insert: true,
           output: (css, file) => {
-            const AssetCtor = REQUIRE_PACK.parser.get('css')
+            const AssetCtor = store.parser.get('css')
             const depAsset = new AssetCtor({
               name: file,
               content: css,
@@ -77,7 +75,7 @@ class JsAsset extends Asset {
     return {
       format: 'amd',
       file: this.distpath,
-      paths: REQUIRE_PACK.rollupPaths,
+      paths: store.rollupPaths,
       sourcemap: true
     }
   }
@@ -89,7 +87,7 @@ class JsAsset extends Asset {
   }
   setRollupWatcher() {
     this.rollupWatcher && this.rollupWatcher.close()
-    REQUIRE_PACK.isUpdatingConfig = false
+    store.isUpdatingConfig = false
     this.rollupWatcher = rollup.watch(this.watchOptions)
     this.rollupWatcher.on('event', async e => {
       if (e.code === 'BUNDLE_END') {
@@ -107,10 +105,10 @@ class JsAsset extends Asset {
 
   async transform(code) {
     // development mode,rollup watch mode
-    if (IS_DEV) {
+    if (IS_DEV()) {
       this.autoOutput = false
       // already has watcher
-      if (this.rollupWatcher && !REQUIRE_PACK.isUpdatingConfig) {
+      if (this.rollupWatcher && !store.isUpdatingConfig) {
         const distContent = await Fse.readFile(this.distpath, {
           encoding: this.encoding
         })

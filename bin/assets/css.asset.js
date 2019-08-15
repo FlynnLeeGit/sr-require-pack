@@ -1,9 +1,8 @@
 const Asset = require('./asset')
 const { isRemote } = require('../utils')
 const CleanCss = require('clean-css')
-
+const store = require('../store')
 const CSS_REQUIRE_REG = /url\(['"]?([^'"\(\)]+)['"]?\)/g
-const REQUIRE_PACK = process.REQUIRE_PACK
 const CLEAN_CSS_OPTS = {
   // format: 'keep-breaks',
   compatibility: 'ie8'
@@ -13,7 +12,7 @@ class CssAsset extends Asset {
   constructor(options) {
     super(options)
     this.type = 'css'
-    this.filename = REQUIRE_PACK.buildConfig.filename.css
+    this.filename = store.buildConfig.filename.css
   }
   async cssTransfrom(code, parserType, { minifyInProd = true } = {}) {
     const tasks = []
@@ -38,7 +37,7 @@ class CssAsset extends Asset {
     })
 
     // css minify
-    if (process.env.NODE_ENV === 'production' && minifyInProd) {
+    if (store.IS_PROD && minifyInProd) {
       this.cssText = new CleanCss(CLEAN_CSS_OPTS).minify(this.cssText).styles
     }
 

@@ -4,9 +4,9 @@ const htmlRender = require('posthtml-render')
 const posthtml = require('posthtml')
 const posthtmlExtend = require('./html/posthtml-extend')
 const chokidar = require('chokidar')
-
 const Asset = require('./asset')
 const UglifyJs = require('uglify-js')
+const store = require('../store')
 
 const _ = require('lodash')
 const Fse = require('fs-extra')
@@ -17,13 +17,13 @@ const injectTpl = Fse.readFileSync(__dirname + '/html/inject.ejs', {
   encoding: 'utf-8'
 })
 
-const REQUIRE_PACK = process.REQUIRE_PACK
+
 
 class HtmlAsset extends Asset {
   constructor(options) {
     super(options)
     this.type = 'html'
-    this.filename = REQUIRE_PACK.buildConfig.filename.html
+    this.filename = store.buildConfig.filename.html
     this.htmlWatchPool = {}
     this.imports = {}
   }
@@ -45,7 +45,7 @@ class HtmlAsset extends Asset {
       tag: 'script',
       attrs: {
         src: `http://localhost:${
-          REQUIRE_PACK.buildConfig.livePort
+          store.buildConfig.livePort
         }/livereload.js`
       }
     }
@@ -70,7 +70,7 @@ class HtmlAsset extends Asset {
       .process(code)
 
     this.ast = p.tree
-    if (process.env.NODE_ENV === 'development') {
+    if (store.IS_DEV()) {
       // watch layouts in dev mode
       this.setHtmlWatcher()
       this.setLiveScript()
@@ -90,22 +90,29 @@ class HtmlAsset extends Asset {
       case 'script':
         const name = node.attrs.src
         if (name && !isRemote(name)) {
-          const jsAsset = this.addDep({ name, parserType: 'js' })
+          // 将入口文件也纳入requirejs管理
+          const mainAsset = this.addDep({ name, parserType: 'js' })
+          const requireConfig = _.cloneDeep(store.requireConfig)
+          const mainEntry = `app-entry-${mainAsset.entry.replace('/', '-')}`
+          requireConfig.paths[mainEntry] =
+            mainAsset.requireDistPaths
+
           this.transformTasks.push(
-            jsAsset.process().then(() => {
+            mainAsset.process().then(() => {
               const compiled = _.template(injectTpl)
               const jsContent = compiled({
                 NODE_ENV: process.env.NODE_ENV,
-                GIT: JSON.stringify(REQUIRE_PACK.GIT),
-                requireConfig: JSON.stringify(REQUIRE_PACK.requireConfig),
-                externalDefine: REQUIRE_PACK.externalDefine,
-                mainUrl: jsAsset.disturl,
-                runtimeUrl: REQUIRE_PACK.runtimeUrl,
+                GIT: JSON.stringify(store.GIT()),
+                requireConfig: JSON.stringify(requireConfig),
+                externalDefine: store.externalDefine,
+                mainEntry,
+                runtimeUrl: store.runtimeUrl,
                 isOnload: node.attrs['require-pack'] === 'onload'
               })
               delete node.attrs.src
               const minifyCode = UglifyJs.minify(jsContent).code
               node.content = minifyCode
+
             })
           )
         }

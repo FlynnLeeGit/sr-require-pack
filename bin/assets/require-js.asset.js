@@ -1,13 +1,13 @@
 const Asset = require('./asset')
 const Path = require('path')
-const REQUIRE_PACK = process.REQUIRE_PACK
+const store = require('../store')
 
 class RequireJsAsset extends Asset {
     constructor(options) {
         super(options)
         this.autoWatch = false
         this.srcDir = this.dir
-        this.filename = REQUIRE_PACK.buildConfig.filename.jsChunk
+        this.filename = store.buildConfig.filename.jsChunk
         this.type = 'js'
     }
 }

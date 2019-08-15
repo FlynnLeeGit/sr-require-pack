@@ -5,5 +5,5 @@ var GIT = <%= GIT %>;
 var REQUIRE_CONFIG = <%= requireConfig %>;  <% } %>
 <% if(NODE_ENV === 'development') { %>console.log('[require-pack] dev mode') <% } %>
 <% if(isOnload) { %>window.addEventListener('load', function () { <% } %>
-    $__injectScript__({src: '<%= runtimeUrl %>' },function(){ require.config(REQUIRE_CONFIG); <%= externalDefine %> require([ '<%= mainUrl %>' ]); });
+    $__injectScript__({src: '<%= runtimeUrl %>' },function(){ require.config(REQUIRE_CONFIG); <%= externalDefine %> require([ '<%= mainEntry %>' ]); });
 <% if(isOnload) { %>}); <% } %>

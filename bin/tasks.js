@@ -2,9 +2,12 @@ const gulp = require('gulp')
 const Fse = require('fs-extra')
 const Path = require('path')
 const _ = require('lodash')
-const { BUILD_NAME, WEB_NAME } = require('./constants')
 const debug = require('./debug')
 const gulpWatch = require('gulp-watch')
+const { BUILD_NAME, WEB_NAME, IS_DEV, IS_PROD, parser } = require('./store')
+const store = require('./store')
+const defaultBuildConfig = store.buildConfig
+const defaultWebConfig = store.webConfig
 
 // sync init require-pack.web.js && require-pack.build.js
 gulp.task('init', function() {
@@ -25,10 +28,7 @@ gulp.task('init', function() {
 
 // sync
 const initEnv = () => {
-  const { getGit } = require('./utils')
   debug.log('[env] -> ', process.env.NODE_ENV)
-  process.REQUIRE_PACK = {}
-  process.REQUIRE_PACK.GIT = getGit()
   debug.end('initEnv')
 }
 
@@ -39,41 +39,15 @@ const initBuildConfig = async () => {
     debug.error(`${BUILD_NAME} is missing`)
   }
   const userBuildConfig = require(Path.resolve(BUILD_NAME))
-  const defaultBuildConfig = {
-    srcDir: './src',
-    distDir: './dist',
-    html: './src/**/*.html',
-    publicUrl: '/',
-    // 默认是随机端口
-    livePort: 0,
-    filename: {
-      js: '_static/js/[name].[ext]?[hash:8]',
-      css: '_static/css/[name].[ext]?[hash:8]',
-      res: '_static/res/[name].[ext]?[hash:8]',
-      jsChunk: '_static/js/chunk/[name].[hash:8].[ext]',
-      cssChunk: '_static/css/chunk/[name].[hash:8].[ext]',
-      resChunk: '_static/res/chunk/[name].[hash:8].[ext]',
-      html: '[name].html'
-    },
-    runtime: __dirname + '/requirejs/require-pack-runtime.js',
-    production: {
-      filename: {
-        js: '_static/js/[name].[hash:8].[ext]',
-        css: '_static/css/[name].[hash:8].[ext]',
-        res: '_static/res/[name].[hash:8].[ext]'
-      }
-    }
-  }
   let buildConfig = _.merge(defaultBuildConfig, userBuildConfig)
-
-  if (process.env.NODE_ENV === 'development') {
+  if (IS_DEV()) {
     const port = await radomPort(buildConfig.livePort)
     buildConfig.livePort = port
-    process.REQUIRE_PACK.buildConfig = buildConfig
+    store.buildConfig = buildConfig
   }
-  if (process.env.NODE_ENV === 'production') {
-    buildConfig = _.merge(buildConfig, buildConfig.production)
-    process.REQUIRE_PACK.buildConfig = buildConfig
+  if (store.IS_PROD()) {
+    buildConfig = _.merge(defaultBuildConfig, buildConfig.production)
+    store.buildConfig = buildConfig
   }
   debug.end('initBuildConfig')
   // radom port or user defined livePort
@@ -83,27 +57,20 @@ const initExternalConfig = () => {
   if (!Fse.existsSync(WEB_NAME)) {
     debug.error(`${WEB_NAME} is missing`)
   }
-  const defaultWebConfig = {
-    paths: {},
-    shim: {},
-    map: {},
-    production: {}
-  }
+
   delete require.cache[Path.resolve(WEB_NAME)]
+
   const userWebConfig = require(Path.resolve(WEB_NAME))
   let webConfig = _.merge(defaultWebConfig, userWebConfig)
 
-  if (process.env.NODE_ENV === 'production') {
+  if (IS_PROD()) {
     webConfig = _.merge(webConfig, webConfig.production)
   }
-  process.REQUIRE_PACK.webConfig = webConfig
+  store.webConfig = webConfig
   debug.end('initExternalConfig')
 }
 
 const assetRegister = () => {
-  const parser = new Map()
-  process.REQUIRE_PACK.parser = parser
-
   const HtmlAsset = require('./assets/html.asset')
   const JsAsset = require('./assets/js.asset')
   const CssAsset = require('./assets/css.asset')
@@ -128,28 +95,23 @@ const assetRegister = () => {
 }
 
 const bundleRuntime = async () => {
-  const parser = process.REQUIRE_PACK.parser
   const AssetCtor = parser.get('rjs')
   const runtimeAsset = new AssetCtor({
-    name: process.REQUIRE_PACK.buildConfig.runtime,
+    name: store.buildConfig.runtime,
     autoWatch: false
   })
   await runtimeAsset.process()
-  process.REQUIRE_PACK.runtimeUrl = runtimeAsset.disturl
+  store.runtimeUrl = runtimeAsset.disturl
   debug.end('bundleRuntime')
 }
 
 const bundleExternal = async () => {
   const {
-    isRemote,
-    isJs,
-    isCss,
     parseModulePath,
     parsePath
   } = require('./utils')
   const _ = require('lodash')
-  const parser = process.REQUIRE_PACK.parser
-  const webConfig = _.cloneDeep(process.REQUIRE_PACK.webConfig)
+  const webConfig = _.cloneDeep(store.webConfig)
 
   const jsPaths = {}
   const cssPaths = {}
@@ -182,7 +144,7 @@ const bundleExternal = async () => {
           const rjsAsset = new RjsCtor({ name: modulePath })
           tasks.push(
             rjsAsset.process().then(() => {
-              jsPaths[key] = rjsAsset.disturl.replace(/\.js$/, '')
+              jsPaths[key] = rjsAsset.requireDistPaths
             })
           )
           break
@@ -191,7 +153,7 @@ const bundleExternal = async () => {
           const rcssAsset = new RcssCtor({ name: modulePath })
           tasks.push(
             rcssAsset.process().then(() => {
-              cssPaths[key] = rcssAsset.disturl.replace(/\.css$/, '')
+              cssPaths[key] = rcssAsset.requireDistPaths
             })
           )
           break
@@ -204,8 +166,8 @@ const bundleExternal = async () => {
   _.forEach(webConfig.shim, (val, name) => {
     if (_.isArray(val)) {
       const _deps = val
-      webConfig.shim[name] = _deps.map(
-        dep => (dep in cssPaths ? `css!${dep}` : dep)
+      webConfig.shim[name] = _deps.map(dep =>
+        dep in cssPaths ? `css!${dep}` : dep
       )
     }
     if (_.isPlainObject(val)) {
@@ -227,32 +189,27 @@ const bundleExternal = async () => {
       externalPaths[name]
     }});\n`
   }
-  process.REQUIRE_PACK.requireConfig = requireConfig
-  process.REQUIRE_PACK.rollupExternal = [
+
+  store.requireConfig = requireConfig
+  store.rollupExternal = [
     ...Object.keys(jsPaths),
     ...Object.keys(cssPaths),
     ...Object.keys(externalPaths)
   ]
 
-  process.REQUIRE_PACK.rollupPaths = Object.keys(cssPaths).reduce(
-    (ret, cssKey) => {
-      ret[cssKey] = `css!${cssKey}`
-      return ret
-    },
-    {}
-  )
-  process.REQUIRE_PACK.externalDefine = externalDefine
+  store.rollupPaths = Object.keys(cssPaths).reduce((ret, cssKey) => {
+    ret[cssKey] = `css!${cssKey}`
+    return ret
+  }, {})
+  store.externalDefine = externalDefine
   debug.end('bundleExternal')
 }
 
 const bundleHtmls = async () => {
   const glob = require('glob')
-  const buildConfig = process.REQUIRE_PACK.buildConfig
-  const parser = process.REQUIRE_PACK.parser
-
   const HtmlAsset = parser.get('html')
 
-  const htmls = glob.sync(buildConfig.html)
+  const htmls = glob.sync(store.buildConfig.html)
   const tasks = []
 
   const htmlAssets = []
@@ -262,27 +219,27 @@ const bundleHtmls = async () => {
     tasks.push(htmlAsset.process())
   })
   await Promise.all(tasks)
-  process.REQUIRE_PACK.htmlAssets = htmlAssets
+  store.htmlAssets = htmlAssets
   debug.end('bundleHtmls')
 }
 
 const liveServer = () => {
   const liveReload = require('livereload')
-  const PORT = process.REQUIRE_PACK.buildConfig.livePort
+  const PORT = store.buildConfig.livePort
   debug.log('liveReload running on port', PORT)
   const liveServer = liveReload.createServer({
     delay: 50,
     port: PORT
   })
-  liveServer.watch(process.REQUIRE_PACK.buildConfig.distDir)
+  liveServer.watch(store.buildConfig.distDir)
 }
 
 const watchWebConfig = async () => {
-  const htmlAssets = process.REQUIRE_PACK.htmlAssets
+  const htmlAssets = store.htmlAssets
   await initExternalConfig()
   await bundleExternal()
   const promises = []
-  process.REQUIRE_PACK.isUpdatingConfig = true
+  store.isUpdatingConfig = true
   htmlAssets.forEach(htmlAsset => {
     promises.push(htmlAsset.process())
   })
@@ -290,13 +247,12 @@ const watchWebConfig = async () => {
 }
 
 const watchHtmlAdd = async e => {
-  const REQUIRE_PACK = process.REQUIRE_PACK
   if (e.event === 'add') {
-    const AssetCtor = REQUIRE_PACK.parser.get('html')
+    const AssetCtor = parser.get('html')
     const htmlAsset = new AssetCtor({
       name: e.path
     })
-    REQUIRE_PACK.htmlAssets.push(htmlAsset)
+    store.htmlAssets.push(htmlAsset)
     await htmlAsset.process()
   }
 }
@@ -314,7 +270,7 @@ gulp.task(
 )
 gulp.task('watch', ['initBuildConfig'], function() {
   gulpWatch(WEB_NAME, watchWebConfig)
-  gulpWatch(process.REQUIRE_PACK.buildConfig.html, watchHtmlAdd)
+  gulpWatch(store.buildConfig.html, watchHtmlAdd)
 })
 
 // 开发

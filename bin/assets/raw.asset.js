@@ -1,12 +1,11 @@
 const Asset = require('./asset')
-const REQUIRE_PACK = process.REQUIRE_PACK
-
+const store = require('../store')
 class RawAsset extends Asset {
     constructor(options) {
         super(options)
         this.encoding = ''
         this.autoWatch = false
-        this.filename = REQUIRE_PACK.buildConfig.filename.res
+        this.filename = store.buildConfig.filename.res
     }
     rawTransform(content) {
         if (content.length < 5 * 1024) {
