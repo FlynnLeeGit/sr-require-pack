@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev":"node ../bin/index dev",
-    "build":"node ../bin/index build"
+    "dev":"rm -rf dist && node ../bin/index dev",
+    "build":"rm -rf dist && node ../bin/index build"
   },
   "dependencies": {
     "fancybox": "^2.1.5",

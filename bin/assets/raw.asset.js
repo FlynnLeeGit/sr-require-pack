@@ -13,11 +13,11 @@ class RawAsset extends Asset {
     this.filenameCss = store.buildConfig.filename.css
   }
   get rawDistUrl() {
-    const rawFilename = Path.relative(
-      Path.dirname(this.filenameCss),
-      this.filename
+    const parentDistDir = Path.dirname(this.parent.distname)
+    const rawDistname = Path.relative(
+      parentDistDir,
+      this.distname
     )
-    const rawDistname = this.calcDistname(rawFilename)
     if (isBase64(this.transformContent)) {
       return this.transformContent
     } else {
