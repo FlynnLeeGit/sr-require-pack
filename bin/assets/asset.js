@@ -105,12 +105,18 @@ class Asset {
   get entry() {
     return Path.join(Path.dirname(this.relname), Path.parse(this.relname).name)
   }
-  calcDistname(filename = ''){
+  /**
+   * get entryName 'saas-mina\\test\\index' -> 'saas-mina-test-index'
+   */
+  get entryName() {
+    return normalizePath(this.entry).replace('/', '-')
+  }
+  calcDistname(filename = '') {
     return filename
       .replace('[name]', this.entry)
       .replace(/\[hash:(\d+)\]/, (match, len) => this.hash.slice(0, +len))
       .replace('[time]', Number.parseInt(Date.now() / 1000))
-      .replace('[ext]', this.type) 
+      .replace('[ext]', this.type)
   }
   get distname() {
     return this.calcDistname(this.filename)

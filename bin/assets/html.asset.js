@@ -89,8 +89,8 @@ class HtmlAsset extends Asset {
           // 将入口文件也纳入requirejs管理
           const mainAsset = this.addDep({ name, parserType: 'js' })
           const requireConfig = _.cloneDeep(store.requireConfig)
-          const mainEntry = `app-entry-${mainAsset.entry.replace(/\//g, '-')}`
-
+          const mainEntry = `app-entry-${mainAsset.entryName}`
+          
           this.transformTasks.push(
             mainAsset.process().then(() => {
               requireConfig.paths[mainEntry] = mainAsset.requireDistUrl
