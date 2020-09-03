@@ -33,7 +33,7 @@
     "rollup-plugin-node-resolve": "3.3.0",
     "rollup-plugin-uglify": "6.0.2",
     "rollup-plugin-vue": "4.7.2",
-    "serve": "6.5.6",
+    "serve": "11.3.2",
     "uglify-js": "3.3.23",
     "yargs": "11.0.0"
   },
